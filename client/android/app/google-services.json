@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "616767248215",
+    "project_id": "cim-storage",
+    "storage_bucket": "cim-storage.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:616767248215:android:bf972146abab2a87155012",
+        "android_client_info": {
+          "package_name": "com.cim_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiEfHckRe0jMtdm4o5y1BYPcGEK_IlDiE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
