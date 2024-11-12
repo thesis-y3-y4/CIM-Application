@@ -26,6 +26,8 @@ const authenticateToken = require("./middleware/auth");
 const mongoUrl = process.env.MONGO_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
 
+app.use("/assets", express.static(__dirname + "client/assets"));
+
 mongoose
   .connect(mongoUrl)
   .then(() => {
@@ -55,11 +57,6 @@ io.on("connection", (socket) => {
   socket.on("sendNotification", (notification) => {
     io.emit("notification", notification);
   });
-});
-
-// Define a route for the root to prevent "Cannot GET /"
-app.get("/", (req, res) => {
-  res.send("Backend server is up and running!");
 });
 
 const PORT = process.env.PORT || 4000;
