@@ -42,7 +42,7 @@ const socketIo = require("socket.io");
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://192.168.0.157:8002",
+    origin: "https://cim-application.onrender.com/",
     methods: ["GET", "POST"],
   },
 });
