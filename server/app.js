@@ -59,6 +59,13 @@ io.on("connection", (socket) => {
   });
 });
 
+app.use(
+  cors({
+    origin: "https://cim-application.onrender.com",
+    methods: ["GET", "POST"],
+  })
+);
+
 // Define a route for the root to prevent "Cannot GET /"
 app.get("/", (req, res) => {
   res.send("Backend server is up and running!");
@@ -135,9 +142,7 @@ app.post("/announcedata", async (req, res) => {
       .exec();
 
     io.emit("announcement", announcements);
-
     res.status(200).send({ status: "success", announcements });
-    res.json(announcements);
   } catch (error) {
     return res.send({ error: error });
   }
