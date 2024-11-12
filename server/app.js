@@ -59,6 +59,9 @@ io.on("connection", (socket) => {
   });
 });
 
+const PORT = process.env.PORT || 4000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
 app.post("/login-user", async (req, res) => {
   const { studentemail, password } = req.body;
 
@@ -975,8 +978,6 @@ app.get("/frienddata/:friendId", authenticateToken, async (req, res) => {
   }
 });
 
-const port = process.env.PORT || 8001;
-
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+app.listen("8001", () => {
+  console.log("NodeJS Server is running on port 8001");
 });
