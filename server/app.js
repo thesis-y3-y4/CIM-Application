@@ -137,6 +137,7 @@ app.post("/announcedata", async (req, res) => {
     io.emit("announcement", announcements);
 
     res.status(200).send({ status: "success", announcements });
+    res.json(announcements);
   } catch (error) {
     return res.send({ error: error });
   }
