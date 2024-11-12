@@ -26,8 +26,6 @@ const authenticateToken = require("./middleware/auth");
 const mongoUrl = process.env.MONGO_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-app.use("/assets", express.static(__dirname + "client/assets"));
-
 mongoose
   .connect(mongoUrl)
   .then(() => {
@@ -57,6 +55,11 @@ io.on("connection", (socket) => {
   socket.on("sendNotification", (notification) => {
     io.emit("notification", notification);
   });
+});
+
+// Define a route for the root to prevent "Cannot GET /"
+app.get("/", (req, res) => {
+  res.send("Backend server is up and running!");
 });
 
 const PORT = process.env.PORT || 4000;
@@ -976,8 +979,4 @@ app.get("/frienddata/:friendId", authenticateToken, async (req, res) => {
     console.error("Error fetching friend's data:", error);
     return res.status(500).send({ error: "Internal server error" });
   }
-});
-
-app.listen("8001", () => {
-  console.log("NodeJS Server is running on port 8001");
 });
