@@ -980,3 +980,7 @@ app.get("/frienddata/:friendId", authenticateToken, async (req, res) => {
     return res.status(500).send({ error: "Internal server error" });
   }
 });
+
+app.listen("8001", () => {
+  console.log("NodeJS Server is running on port 8001");
+});
