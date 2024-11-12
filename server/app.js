@@ -26,13 +26,15 @@ const authenticateToken = require("./middleware/auth");
 const mongoUrl = process.env.MONGO_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
 
+app.use("/assets", express.static(__dirname + "client/assets"));
+
 mongoose
   .connect(mongoUrl)
   .then(() => {
-    console.log("Nakakonekta na sa MongoDB");
+    console.log("Successfully connected to the database");
   })
   .catch((err) => {
-    console.log("Hindi konektado sa database \n", err);
+    console.log("Database connection failed: \n", err);
   });
 
 const http = require("http");
@@ -56,9 +58,6 @@ io.on("connection", (socket) => {
     io.emit("notification", notification);
   });
 });
-
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 app.post("/login-user", async (req, res) => {
   const { studentemail, password } = req.body;
@@ -976,6 +975,8 @@ app.get("/frienddata/:friendId", authenticateToken, async (req, res) => {
   }
 });
 
-app.listen("8001", () => {
-  console.log("Ang Node js server ay nagsimula na sa port 8001");
+const port = process.env.PORT || 8001;
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
