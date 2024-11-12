@@ -59,6 +59,11 @@ io.on("connection", (socket) => {
   });
 });
 
+// Define a route for the root to prevent "Cannot GET /"
+app.get("/", (req, res) => {
+  res.send("Backend server is up and running!");
+});
+
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
