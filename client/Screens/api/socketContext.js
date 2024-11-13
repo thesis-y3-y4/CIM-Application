@@ -17,7 +17,7 @@ const SocketProvider = ({children}) => {
       const userDataResponse = await fetchData('/userdata', token);
       const userID = userDataResponse.data.data._id;
 
-      const newSocket = io('http://192.168.1.11:8000', {
+      const newSocket = io('https://thesis-cim-23.onrender.com', {
         transports: ['websocket'],
         query: {
           userId: userID,
