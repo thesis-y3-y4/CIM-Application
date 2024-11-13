@@ -263,7 +263,7 @@ const LoginNav = () => {
 };
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [socket, setSocket] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
 

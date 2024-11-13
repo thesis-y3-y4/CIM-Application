@@ -25,7 +25,6 @@ const authenticateToken = require("./middleware/auth");
 
 const mongoUrl = process.env.MONGO_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
-
 app.use("/assets", express.static(__dirname + "client/assets"));
 
 mongoose
@@ -37,12 +36,20 @@ mongoose
     console.log("Database connection failed: \n", err);
   });
 
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(__dirname + "client/build"));
+  console.log("Server is running in production mode");
+} else {
+  app.use(express.static(__dirname + "client/build"));
+  console.log("Server is running in development mode");
+}
+
 const http = require("http");
 const socketIo = require("socket.io");
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "https://cim-application.onrender.com/",
+    origin: "https://thesis-cim-23.onrender.com",
     methods: ["GET", "POST"],
   },
 });
@@ -61,7 +68,7 @@ io.on("connection", (socket) => {
 
 app.use(
   cors({
-    origin: "https://cim-application.onrender.com",
+    origin: "*",
     methods: ["GET", "POST"],
   })
 );
