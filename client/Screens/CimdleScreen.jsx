@@ -230,10 +230,6 @@ function CimdleScreen(props) {
     <ScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.scrollViewContent}>
-      {/* <View>
-        <NavigationBar navigation={navigation} />
-      </View> */}
-
       <View style={styles.container}>
         <Text style={styles.title}> CIMDLE </Text>
         <Text style={styles.gameDesc}> Guess the word for more surprises.</Text>

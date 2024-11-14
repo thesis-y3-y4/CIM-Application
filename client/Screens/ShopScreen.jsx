@@ -1,4 +1,13 @@
-import {Text, View, ScrollView, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import {
+  Text,
+  View,
+  ScrollView,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+} from 'react-native';
 import React from 'react';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
@@ -11,112 +20,111 @@ import {getToken} from './api/tokenStorage';
 const frames = {
   cub: [
     {
-      id: 'frame1',
+      id: 'cub_frame1',
       name: 'Cub Frame 1',
       cost: 100,
       image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_1.png'),
     },
     {
-      id: 'frame2',
+      id: 'cub_frame2',
       name: 'Cub Frame 2',
       cost: 200,
       image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_2.png'),
     },
     {
-      id: 'frame2',
-      name: 'Cub Frame 2',
+      id: 'cub_frame3',
+      name: 'Cub Frame 3',
       cost: 200,
       image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_3.png'),
     },
     {
-      id: 'frame2',
-      name: 'Cub Frame 2',
+      id: 'cub_frame4',
+      name: 'Cub Frame 4',
       cost: 200,
       image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_4.png'),
     },
     {
-      id: 'frame2',
-      name: 'Cub Frame 2',
+      id: 'cub_frame5',
+      name: 'Cub Frame 5',
       cost: 200,
       image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_5.png'),
     },
   ],
   juvenile: [
     {
-      id: 'frame1',
+      id: 'juvenile_frame1',
       name: 'Juvenile Frame 1',
       cost: 500,
       image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_1.png'),
     },
     {
-      id: 'frame1',
-      name: 'Juvenile Frame 1',
+      id: 'juvenile_frame2',
+      name: 'Juvenile Frame 2',
       cost: 500,
       image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_2.png'),
     },
     {
-      id: 'frame1',
-      name: 'Juvenile Frame 1',
+      id: 'juvenile_frame3',
+      name: 'Juvenile Frame 3',
       cost: 500,
       image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_3.png'),
     },
     {
-      id: 'frame1',
-      name: 'Juvenile Frame 1',
+      id: 'juvenile_frame4',
+      name: 'Juvenile Frame 4',
       cost: 500,
       image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_4.png'),
     },
     {
-      id: 'frame1',
-      name: 'Juvenile Frame 1',
+      id: 'juvenile_frame5',
+      name: 'Juvenile Frame 5',
       cost: 500,
       image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_5.png'),
     },
   ],
   wildcat: [
     {
-      id: 'frame1',
+      id: 'wildcat_frame1',
       name: 'Wildcat Frame 1',
       cost: 2000,
       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_1.png'),
     },
     {
-      id: 'frame1',
-      name: 'Wildcat Frame 1',
+      id: 'wildcat_frame2',
+      name: 'Wildcat Frame 2',
       cost: 2000,
       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_2.png'),
     },
     {
-      id: 'frame1',
-      name: 'Wildcat Frame 1',
+      id: 'wildcat_frame3',
+      name: 'Wildcat Frame 3',
       cost: 2000,
       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_3.png'),
     },
     {
-      id: 'frame1',
-      name: 'Wildcat Frame 1',
+      id: 'wildcat_frame4',
+      name: 'Wildcat Frame 4',
       cost: 2000,
       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_4.png'),
     },
     {
-      id: 'frame1',
-      name: 'Wildcat Frame 1',
+      id: 'wildcat_frame5',
+      name: 'Wildcat Frame 5',
       cost: 2000,
       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_5.png'),
     },
     {
-      id: 'frame1',
-      name: 'Wildcat Frame 1',
+      id: 'wildcat_frame6',
+      name: 'Wildcat Frame 6',
       cost: 2000,
       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_6.png'),
     },
   ],
 };
-
-function ShopScreen(props) {
+function ShopScreen() {
   const navigation = useNavigation();
   const [userData, setUserData] = useState('');
-  const [framesByTier, setFramesByTier] = useState(frames); // Using the defined frames above
+  const [allFrames, setAllFrames] = useState([]);
 
   async function getData() {
     const token = await getToken();
@@ -130,16 +138,22 @@ function ShopScreen(props) {
 
   useEffect(() => {
     getData();
+
+    // Combine all frames into one array for the FlatList
+    const combinedFrames = [
+      ...frames.cub.map(frame => ({...frame, tier: 'Cub'})),
+      ...frames.juvenile.map(frame => ({...frame, tier: 'Juvenile'})),
+      ...frames.wildcat.map(frame => ({...frame, tier: 'Wildcat'})),
+    ];
+    setAllFrames(combinedFrames);
   }, []);
 
   const purchaseFrame = frameCost => {
     if (userData.clawMarks >= frameCost) {
-      // Deduct claw marks and unlock frame (you'll handle this in backend and UI state)
       Alert.alert(
         'Purchase Successful!',
         `You have unlocked the frame for ${frameCost} Claw Marks.`,
       );
-      // Here you would add API call to update user data on the server
     } else {
       Alert.alert(
         'Insufficient Claw Marks',
@@ -148,39 +162,36 @@ function ShopScreen(props) {
     }
   };
 
-  return (
-    <ScrollView contentContainerStyle={styles.scrollViewContent}>
-      <View>
-        <NavigationBar navigation={navigation} />
+  const renderFrame = ({item}) => (
+    <View style={styles.frameCard}>
+      <Image source={item.image} style={styles.frameImage} />
+      <Text style={styles.frameName}>{item.name}</Text>
+      <Text style={styles.frameCost}>{item.cost} Claw Marks</Text>
+      <TouchableOpacity
+        style={styles.purchaseButton}
+        onPress={() => purchaseFrame(item.cost)}>
+        <Text style={styles.purchaseButtonText}>Unlock</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
-        <View style={styles.container}>
-          <Text style={styles.title}>Shop</Text>
-          {Object.keys(framesByTier).map(tier => (
-            <View key={tier} style={styles.tierContainer}>
-              <Text style={styles.tierTitle}>
-                {tier.charAt(0).toUpperCase() + tier.slice(1)} Tier Frames
-              </Text>
-              <View style={styles.frameRow}>
-                {framesByTier[tier].map(frame => (
-                  <View key={frame.id} style={styles.frameCard}>
-                    <Image source={frame.image} style={styles.frameImage} />
-                    <Text style={styles.frameName}>{frame.name}</Text>
-                    <Text style={styles.frameCost}>
-                      {frame.cost} Claw Marks
-                    </Text>
-                    <TouchableOpacity
-                      style={styles.purchaseButton}
-                      onPress={() => purchaseFrame(frame.cost)}>
-                      <Text style={styles.purchaseButtonText}>Unlock</Text>
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </View>
-            </View>
-          ))}
-        </View>
+  return (
+    <View style={styles.container}>
+      {/* Move NavigationBar outside the scrollable content */}
+      <NavigationBar navigation={navigation} />
+
+      <View style={styles.contentContainer}>
+        <Text style={styles.title}>Shop</Text>
+        <FlatList
+          data={allFrames}
+          keyExtractor={item => item.id}
+          renderItem={renderFrame}
+          numColumns={2}
+          columnWrapperStyle={styles.frameRow}
+          contentContainerStyle={styles.flatListContent}
+        />
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -188,7 +199,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'darkgreen',
-    padding: 10,
+  },
+  contentContainer: {
+    flex: 1,
   },
   title: {
     fontSize: 24,
@@ -197,27 +210,23 @@ const styles = StyleSheet.create({
     marginVertical: 15,
     textAlign: 'center',
   },
-  tierContainer: {
-    marginBottom: 20,
-  },
-  tierTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'lightgrey',
-    marginBottom: 10,
-  },
   frameRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
+  },
+  flatListContent: {
+    paddingHorizontal: 10,
   },
   frameCard: {
-    width: '45%',
+    width: '48%',
     backgroundColor: 'white',
     borderRadius: 8,
     padding: 10,
     alignItems: 'center',
     marginBottom: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   frameImage: {
     width: 80,
@@ -247,4 +256,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
 export default ShopScreen;

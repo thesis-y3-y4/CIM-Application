@@ -3,7 +3,11 @@ import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
 import {Avatar, Title} from 'react-native-paper';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import {
+  useNavigation,
+  useFocusEffect,
+  DrawerActions,
+} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {fetchData} from './Screens/api/api';
@@ -81,6 +85,9 @@ function DrawerContent({refreshData}) {
 
   async function signOut() {
     try {
+      //close DrawerContent
+      navigation.dispatch(DrawerActions.closeDrawer());
+
       await AsyncStorage.removeItem('isLoggedIn');
       await AsyncStorage.removeItem('token');
 
