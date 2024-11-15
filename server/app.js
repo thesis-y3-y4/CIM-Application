@@ -21,7 +21,7 @@ const forumUserReactionModel = require("./models/forumUserReaction");
 const minigameModel = require("./models/minigame");
 const friendRequestModel = require("./models/friendRequest");
 const friendsModel = require("./models/friends");
-const minigameShopItemModel = require("./models/minigameshopitem");
+const minigameShopItemModel = require("./models/minigameshopitems");
 
 //Middleware
 const authenticateToken = require("./middleware/auth");
