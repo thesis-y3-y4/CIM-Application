@@ -50,7 +50,7 @@ const announcementSchema = new mongoose.Schema({
   },
   minigame: {
     type: String,
-    enum: ["CIM Wordle", "Coming Soon"], // add games soon
+    enum: ["CIM Wordle", "Flappy CIM"], // add games soon
     default: null,
   },
   minigameWord: {

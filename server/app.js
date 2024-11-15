@@ -8,6 +8,7 @@ app.use(express.json());
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+//Models
 const userModel = require("./models/user");
 const announcementModel = require("./models/announcements");
 const eventModel = require("./models/events");
@@ -21,10 +22,12 @@ const minigameModel = require("./models/minigame");
 const friendRequestModel = require("./models/friendRequest");
 const friendsModel = require("./models/friends");
 
+//Middleware
 const authenticateToken = require("./middleware/auth");
 
 const mongoUrl = process.env.MONGO_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
+
 app.use("/assets", express.static(__dirname + "client/assets"));
 
 mongoose
@@ -590,29 +593,70 @@ app.post("/playminigame", authenticateToken, async (req, res) => {
   const { announcementId, game, result, stats } = req.body;
   const userId = req.user.id;
 
-  // Ensure required fields are present
-  if (!announcementId || !game || !result) {
+  // Debug log to see the incoming request body
+  console.log("Received request body:", req.body);
+
+  // Check for missing fields
+  if (!announcementId || !game || !result || !stats) {
     return res.status(400).send({
       status: "error",
       message: "Missing announcement ID, game type, or result",
     });
   }
 
+  let gameStats = {};
+
+  // Check for FlappyCIM game type
+  if (game === "Flappy CIM" && stats && stats.FlappyCIM) {
+    gameStats = {
+      result,
+      points: stats.points || 0,
+      CIMWordle: {}, // Ensure CIMWordle stats are empty for FlappyCIM
+      FlappyCIM: {
+        tries: stats.FlappyCIM?.tries || 0, // Default to 0 if FlappyCIM.tries is undefined
+      },
+    };
+  }
+  // Check for CIM Wordle game type
+  else if (game === "CIM Wordle" && stats && stats.CIMWordle) {
+    if (stats.CIMWordle.hasOwnProperty("guesses")) {
+      gameStats = {
+        result,
+        points: stats.points || 0,
+        CIMWordle: {
+          guesses: stats.CIMWordle.guesses || 0, // Default to 0 if guesses is undefined
+        },
+      };
+    } else {
+      // Handle case where CIMWordle exists but guesses is missing
+      return res.status(400).send({
+        status: "error",
+        message: "'guesses' property missing in CIMWordle stats",
+      });
+    }
+  }
+  // If neither FlappyCIM nor CIMWordle
+  else {
+    // Fall back to generic stats if no specific game stats found
+    gameStats = {
+      result,
+      points: stats?.points || 0, // Ensure points is set even if stats is undefined
+    };
+  }
+
   try {
+    // Create the new minigame entry
     const newMinigame = new minigameModel({
       announcementId,
       userId,
       game,
       playedAt: Date.now(),
-      stats: {
-        result,
-        points: stats.points,
-        CIMWordle: {
-          guesses: stats.CIMWordle.guesses,
-        },
-      },
+      stats: gameStats,
     });
+
     await newMinigame.save();
+
+    // Update the user's claw marks based on the stats
     const user = await userModel.findById(userId);
     const mobileUser = user ? null : await mobileUserModel.findById(userId);
 
@@ -635,6 +679,11 @@ app.post("/playminigame", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error("Error saving minigame entry:", error);
     res.status(500).send({ status: "error", message: "Internal server error" });
+    if (error.response) {
+      console.error("Response error:", error.response);
+    } else {
+      console.error("Request error:", error.message);
+    }
   }
 });
 
@@ -698,7 +747,9 @@ app.get(
       }
     } catch (error) {
       console.error("Error checking game record:", error);
-      res.status(500).json({ message: "Server error" });
+      res
+        .status(500)
+        .send({ status: "error", message: "Internal server error" });
     }
   }
 );

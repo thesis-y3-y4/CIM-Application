@@ -177,7 +177,6 @@ function ShopScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Move NavigationBar outside the scrollable content */}
       <NavigationBar navigation={navigation} />
 
       <View style={styles.contentContainer}>
@@ -198,7 +197,7 @@ function ShopScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'darkgreen',
+    backgroundColor: 'white',
   },
   contentContainer: {
     flex: 1,
@@ -206,7 +205,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: 'white',
+    color: 'green',
     marginVertical: 15,
     textAlign: 'center',
   },
@@ -217,21 +216,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   frameCard: {
-    width: '48%',
+    flex: 1,
     backgroundColor: 'white',
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'grey',
     padding: 10,
     alignItems: 'center',
     marginBottom: 10,
     shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 5,
+    marginHorizontal: 5,
   },
   frameImage: {
-    width: 80,
-    height: 80,
-    marginBottom: 5,
+    width: 100,
+    height: 100,
+    marginBottom: 10,
+    resizeMode: 'contain',
   },
   frameName: {
     fontSize: 16,

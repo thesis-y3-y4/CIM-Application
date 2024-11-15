@@ -68,15 +68,19 @@ const AnnouncementCard = ({
   };
 
   const handleGameStart = () => {
-    const handleGameStart = () => {
+    if (item.minigame === 'CIM Wordle') {
+      // Navigate to 'Cimdle'
       navigation.navigate('Cimdle', {announcementId: item._id});
-      setRefreshCheck(prev => !prev);
-    };
+    } else if (item.minigame === 'Flappy CIM') {
+      // Navigate to 'FlappyCim'
+      navigation.navigate('FlappyCim', {announcementId: item._id});
+    }
+
+    setRefreshCheck(prev => !prev);
   };
 
   let mediaElement = null;
-  const showStartButton =
-    item.minigame && item.minigameWord && !hasPlayedGame && !item.gameOver;
+  const showStartButton = item.minigame && !hasPlayedGame && !item.gameOver;
 
   if (
     item.mediaUrl &&
@@ -92,9 +96,7 @@ const AnnouncementCard = ({
             <View style={styles.overlay} />
             <TouchableOpacity
               style={styles.startButton}
-              onPress={() =>
-                navigation.navigate('Cimdle', {announcementId: item._id})
-              }>
+              onPress={() => handleGameStart()}>
               <Text style={styles.startButtonText}>START</Text>
             </TouchableOpacity>
           </View>

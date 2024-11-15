@@ -17,7 +17,7 @@ const minigameSchema = new mongoose.Schema({
   },
   game: {
     type: String,
-    enum: ["CIM Wordle", "NewGame1", "NewGame2"],
+    enum: ["CIM Wordle", "Flappy CIM"],
     required: true,
   },
   playedAt: {
@@ -37,13 +37,9 @@ const minigameSchema = new mongoose.Schema({
     CIMWordle: {
       guesses: { type: Number, default: null },
     },
-    NewGame1: {
-      // Add fields specific to NewGame1 here
+    FlappyCIM: {
+      tries: { type: Number, default: null },
     },
-    NewGame2: {
-      // Add fields specific to NewGame2 here
-    },
-    
   },
 });
 

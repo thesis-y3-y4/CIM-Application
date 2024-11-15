@@ -29,7 +29,8 @@ import AboutScreen from './Screens/AboutScreen';
 import LoginPage from './Screens/Login/LoginPage';
 import CommunityDetailsScreen from './Screens/Community/CommunityDetailsScreen';
 import CreatePostScreen from './Screens/Community/CreatePostScreen';
-import CimdleScreen from './Screens/CimdleScreen';
+import CimdleScreen from './Screens/Minigames/CimdleScreen';
+import FlappyCimScreen from './Screens/Minigames/FlappyCimScreen';
 import AnnouncementPostScreen from './Screens/AnnouncementPost';
 import ProfileFriendScreen from './Screens/ProfileFriendScreen';
 import ShopScreen from './Screens/ShopScreen';
@@ -218,6 +219,7 @@ const StackNav = () => {
       />
       <Stack.Screen name="CreatePost" component={CreatePostScreen} />
       <Stack.Screen name="Cimdle" component={CimdleScreen} />
+      <Stack.Screen name="FlappyCim" component={FlappyCimScreen} />
       <Stack.Screen
         name="AnnouncementPost"
         component={AnnouncementPostScreen}
@@ -263,7 +265,7 @@ const LoginNav = () => {
 };
 
 function App() {
-const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [socket, setSocket] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
 

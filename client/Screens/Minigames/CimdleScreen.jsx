@@ -2,11 +2,11 @@ import {Text, View, ScrollView, StyleSheet, Alert} from 'react-native';
 import React from 'react';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
-import NavigationBar from './components/NavigationBar';
+import NavigationBar from '../components/NavigationBar';
 import Toast from 'react-native-toast-message';
 
-import {getToken} from './api/tokenStorage';
-import {fetchData} from './api/api';
+import {getToken} from '../api/tokenStorage';
+import {fetchData} from '../api/api';
 
 import {colors, CLEAR, ENTER} from './src/constants';
 import Keyboard from './src/cimdle_components/Keyboard';
@@ -74,7 +74,7 @@ function CimdleScreen(props) {
 
   async function submitGameResult(result) {
     const token = await getToken();
-    const points = calculatePoints(curRow); // Use curRow as guesses
+    const points = calculatePoints(curRow);
     const stats = {
       result,
       points,
@@ -96,11 +96,10 @@ function CimdleScreen(props) {
       });
 
       if (response.status === 201) {
-        console.log('Minigame result submitted:', response.data);
+        console.log('CIMLDE result submitted:', response.data);
       }
     } catch (error) {
-      console.error('Error submitting game result:', error);
-      Alert.alert('Error', 'Failed to submit game result');
+      console.error('Error submitting CIMDLE result:', error);
     }
   }
 
