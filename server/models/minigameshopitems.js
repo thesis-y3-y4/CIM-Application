@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-// Define the MinigameShopItem schema
 const MinigameShopItemSchema = new mongoose.Schema(
   {
     _id: {

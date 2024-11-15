@@ -188,10 +188,12 @@ function ShopScreen() {
         <FlatList
           data={allFrames}
           keyExtractor={item => item.id}
-          renderItem={renderFrame}
-          numColumns={2}
-          columnWrapperStyle={styles.frameRow}
-          contentContainerStyle={styles.flatListContent}
+          renderItem={({item}) => (
+            <View style={styles.frameCard}>
+              <Image source={{uri: item.imageUrl}} style={styles.frameImage} />
+              <Text style={styles.frameName}>{item.name}</Text>
+            </View>
+          )}
         />
       </View>
     </View>
