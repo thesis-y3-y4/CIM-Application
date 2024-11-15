@@ -1033,7 +1033,7 @@ app.get("/frienddata/:friendId", authenticateToken, async (req, res) => {
 app.get("/minigameshopitems", async (req, res) => {
   try {
     // Fetch all MinigameShopItem documents
-    const items = await MinigameShopItem.find();
+    const items = await minigameShopItemModel.find();
     res.status(200).json(items);
   } catch (error) {
     res.status(500).json({ message: "Error fetching items", error });
