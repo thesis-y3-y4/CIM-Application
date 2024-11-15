@@ -593,10 +593,6 @@ app.post("/playminigame", authenticateToken, async (req, res) => {
   const { announcementId, game, result, stats } = req.body;
   const userId = req.user.id;
 
-  // Debug log to see the incoming request body
-  console.log("Received request body:", req.body);
-
-  // Check for missing fields
   if (!announcementId || !game || !result || !stats) {
     return res.status(400).send({
       status: "error",
@@ -606,41 +602,26 @@ app.post("/playminigame", authenticateToken, async (req, res) => {
 
   let gameStats = {};
 
-  // Check for FlappyCIM game type
-  if (game === "Flappy CIM" && stats && stats.FlappyCIM) {
+  if (game === "CIM Wordle" && stats.CIMWordle) {
     gameStats = {
       result,
       points: stats.points || 0,
-      CIMWordle: {}, // Ensure CIMWordle stats are empty for FlappyCIM
-      FlappyCIM: {
-        tries: stats.FlappyCIM?.tries || 0, // Default to 0 if FlappyCIM.tries is undefined
+      CIMWordle: {
+        guesses: stats.CIMWordle.guesses || 0,
       },
     };
-  }
-  // Check for CIM Wordle game type
-  else if (game === "CIM Wordle" && stats && stats.CIMWordle) {
-    if (stats.CIMWordle.hasOwnProperty("guesses")) {
-      gameStats = {
-        result,
-        points: stats.points || 0,
-        CIMWordle: {
-          guesses: stats.CIMWordle.guesses || 0, // Default to 0 if guesses is undefined
-        },
-      };
-    } else {
-      // Handle case where CIMWordle exists but guesses is missing
-      return res.status(400).send({
-        status: "error",
-        message: "'guesses' property missing in CIMWordle stats",
-      });
-    }
-  }
-  // If neither FlappyCIM nor CIMWordle
-  else {
-    // Fall back to generic stats if no specific game stats found
+  } else if (game === "Flappy CIM" && stats.FlappyCIM) {
     gameStats = {
       result,
-      points: stats?.points || 0, // Ensure points is set even if stats is undefined
+      points: stats.points || 0,
+      FlappyCIM: {
+        tries: stats.FlappyCIM.tries || 0,
+      },
+    };
+  } else {
+    gameStats = {
+      result,
+      points: stats ? stats.points || 0 : 0,
     };
   }
 
