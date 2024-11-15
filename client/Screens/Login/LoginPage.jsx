@@ -17,6 +17,7 @@ import {
   ScrollView,
   Alert,
   BackHandler,
+  ActivityIndicator,
 } from 'react-native';
 
 function LoginPage({props}) {
@@ -26,9 +27,11 @@ function LoginPage({props}) {
   const [password, setPassword] = useState('');
   const emailInputRef = useRef(null);
   const passwordInputRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
     console.log(studentemail, password);
+    setIsLoading(true);
     const userData = {
       studentemail: studentemail,
       password,
@@ -84,6 +87,13 @@ function LoginPage({props}) {
           onPress: () => Toast.hide(),
         });
       }, 800);
+    } finally {
+      setIsLoading(false);
+      setEmail('');
+      setPassword('');
+      emailInputRef.current.clear();
+      passwordInputRef.current.clear();
+      emailInputRef.current.focus();
     }
   };
 
@@ -172,7 +182,11 @@ function LoginPage({props}) {
           <View style={styles.button}>
             <TouchableOpacity style={styles.inBut} onPress={handleSubmit}>
               <View>
-                <Text style={styles.textSign}>Login</Text>
+                {isLoading ? ( // Conditionally render the loader
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text style={styles.textSign}>Login</Text>
+                )}
               </View>
             </TouchableOpacity>
           </View>

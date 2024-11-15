@@ -158,8 +158,8 @@ function ProfileScreen(props) {
           />
         </View>
 
-        {/* <View style={{alignItems: 'center', position: 'relative'}}> */}
-        <View style={{alignItems: 'center'}}>
+        <View style={{alignItems: 'center', position: 'relative'}}>
+          {/* <View style={{alignItems: 'center'}}> */}
           <TouchableOpacity onPress={handleImagePick}>
             <Avatar.Image
               size={180}
@@ -169,6 +169,12 @@ function ProfileScreen(props) {
                   ? {uri: userData.profilePicture}
                   : require('../assets/default-profile.jpg')
               }
+            />
+            <Image
+              source={require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_5.png')}
+              // source={require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_4.png')}
+              // source={require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_5.png')}
+              style={styles.frameImage}
             />
           </TouchableOpacity>
         </View>
@@ -412,11 +418,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   frameImage: {
-    width: 300,
-    height: 300,
+    width: 250,
+    height: 250,
     position: 'absolute',
-    top: -250,
-    left: -50,
+    top: -240,
+    left: -25,
     zIndex: 0,
   },
   nameText: {

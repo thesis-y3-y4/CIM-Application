@@ -21,6 +21,7 @@ const forumUserReactionModel = require("./models/forumUserReaction");
 const minigameModel = require("./models/minigame");
 const friendRequestModel = require("./models/friendRequest");
 const friendsModel = require("./models/friends");
+const minigameShopItemModel = require("./models/minigameshopitem");
 
 //Middleware
 const authenticateToken = require("./middleware/auth");
@@ -1025,6 +1026,17 @@ app.get("/frienddata/:friendId", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error("Error fetching friend's data:", error);
     return res.status(500).send({ error: "Internal server error" });
+  }
+});
+
+//fetch all minigameshopitem
+app.get("/minigameshopitems", async (req, res) => {
+  try {
+    // Fetch all MinigameShopItem documents
+    const items = await MinigameShopItem.find();
+    res.status(200).json(items);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching items", error });
   }
 });
 

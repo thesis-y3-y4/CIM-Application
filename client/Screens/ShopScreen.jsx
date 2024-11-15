@@ -17,110 +17,111 @@ import NavigationBar from './components/NavigationBar';
 import {fetchData} from './api/api';
 import {getToken} from './api/tokenStorage';
 
-const frames = {
-  cub: [
-    {
-      id: 'cub_frame1',
-      name: 'Cub Frame 1',
-      cost: 100,
-      image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_1.png'),
-    },
-    {
-      id: 'cub_frame2',
-      name: 'Cub Frame 2',
-      cost: 200,
-      image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_2.png'),
-    },
-    {
-      id: 'cub_frame3',
-      name: 'Cub Frame 3',
-      cost: 200,
-      image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_3.png'),
-    },
-    {
-      id: 'cub_frame4',
-      name: 'Cub Frame 4',
-      cost: 200,
-      image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_4.png'),
-    },
-    {
-      id: 'cub_frame5',
-      name: 'Cub Frame 5',
-      cost: 200,
-      image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_5.png'),
-    },
-  ],
-  juvenile: [
-    {
-      id: 'juvenile_frame1',
-      name: 'Juvenile Frame 1',
-      cost: 500,
-      image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_1.png'),
-    },
-    {
-      id: 'juvenile_frame2',
-      name: 'Juvenile Frame 2',
-      cost: 500,
-      image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_2.png'),
-    },
-    {
-      id: 'juvenile_frame3',
-      name: 'Juvenile Frame 3',
-      cost: 500,
-      image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_3.png'),
-    },
-    {
-      id: 'juvenile_frame4',
-      name: 'Juvenile Frame 4',
-      cost: 500,
-      image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_4.png'),
-    },
-    {
-      id: 'juvenile_frame5',
-      name: 'Juvenile Frame 5',
-      cost: 500,
-      image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_5.png'),
-    },
-  ],
-  wildcat: [
-    {
-      id: 'wildcat_frame1',
-      name: 'Wildcat Frame 1',
-      cost: 2000,
-      image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_1.png'),
-    },
-    {
-      id: 'wildcat_frame2',
-      name: 'Wildcat Frame 2',
-      cost: 2000,
-      image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_2.png'),
-    },
-    {
-      id: 'wildcat_frame3',
-      name: 'Wildcat Frame 3',
-      cost: 2000,
-      image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_3.png'),
-    },
-    {
-      id: 'wildcat_frame4',
-      name: 'Wildcat Frame 4',
-      cost: 2000,
-      image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_4.png'),
-    },
-    {
-      id: 'wildcat_frame5',
-      name: 'Wildcat Frame 5',
-      cost: 2000,
-      image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_5.png'),
-    },
-    {
-      id: 'wildcat_frame6',
-      name: 'Wildcat Frame 6',
-      cost: 2000,
-      image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_6.png'),
-    },
-  ],
-};
+// const frames = {
+//   cub: [
+//     {
+//       id: 'cub_frame1',
+//       name: 'Cub Frame 1',
+//       cost: 100,
+//       image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_1.png'),
+//     },
+//     {
+//       id: 'cub_frame2',
+//       name: 'Cub Frame 2',
+//       cost: 200,
+//       image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_2.png'),
+//     },
+//     {
+//       id: 'cub_frame3',
+//       name: 'Cub Frame 3',
+//       cost: 200,
+//       image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_3.png'),
+//     },
+//     {
+//       id: 'cub_frame4',
+//       name: 'Cub Frame 4',
+//       cost: 200,
+//       image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_4.png'),
+//     },
+//     {
+//       id: 'cub_frame5',
+//       name: 'Cub Frame 5',
+//       cost: 200,
+//       image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_5.png'),
+//     },
+//   ],
+//   juvenile: [
+//     {
+//       id: 'juvenile_frame1',
+//       name: 'Juvenile Frame 1',
+//       cost: 500,
+//       image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_1.png'),
+//     },
+//     {
+//       id: 'juvenile_frame2',
+//       name: 'Juvenile Frame 2',
+//       cost: 500,
+//       image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_2.png'),
+//     },
+//     {
+//       id: 'juvenile_frame3',
+//       name: 'Juvenile Frame 3',
+//       cost: 500,
+//       image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_3.png'),
+//     },
+//     {
+//       id: 'juvenile_frame4',
+//       name: 'Juvenile Frame 4',
+//       cost: 500,
+//       image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_4.png'),
+//     },
+//     {
+//       id: 'juvenile_frame5',
+//       name: 'Juvenile Frame 5',
+//       cost: 500,
+//       image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_5.png'),
+//     },
+//   ],
+//   wildcat: [
+//     {
+//       id: 'wildcat_frame1',
+//       name: 'Wildcat Frame 1',
+//       cost: 2000,
+//       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_1.png'),
+//     },
+//     {
+//       id: 'wildcat_frame2',
+//       name: 'Wildcat Frame 2',
+//       cost: 2000,
+//       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_2.png'),
+//     },
+//     {
+//       id: 'wildcat_frame3',
+//       name: 'Wildcat Frame 3',
+//       cost: 2000,
+//       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_3.png'),
+//     },
+//     {
+//       id: 'wildcat_frame4',
+//       name: 'Wildcat Frame 4',
+//       cost: 2000,
+//       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_4.png'),
+//     },
+//     {
+//       id: 'wildcat_frame5',
+//       name: 'Wildcat Frame 5',
+//       cost: 2000,
+//       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_5.png'),
+//     },
+//     {
+//       id: 'wildcat_frame6',
+//       name: 'Wildcat Frame 6',
+//       cost: 2000,
+//       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_6.png'),
+//     },
+//   ],
+// };
+
 function ShopScreen() {
   const navigation = useNavigation();
   const [userData, setUserData] = useState('');
@@ -131,6 +132,9 @@ function ShopScreen() {
     try {
       const response = await fetchData('/userdata', token);
       setUserData(response.data.data);
+
+      const framesResponse = await fetchData('/minigameshopitems', token);
+      setFrames(framesResponse.data);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
