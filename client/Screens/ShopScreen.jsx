@@ -27,7 +27,7 @@ function ShopScreen() {
     try {
       const response = await fetchData('/userdata', token);
       setUserData(response.data.data);
-
+      console.log(response.data.data._id);
       // Fetch minigame shop items
       const framesResponse = await fetchData(
         '/minigameshopitems',
