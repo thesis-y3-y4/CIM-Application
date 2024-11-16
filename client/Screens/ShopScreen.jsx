@@ -20,6 +20,7 @@ function ShopScreen() {
   const [allFrames, setAllFrames] = useState([]);
   const [selectedFrame, setSelectedFrame] = useState(null); // State for selected frame
   const [isModalVisible, setModalVisible] = useState(false); // State for modal visibility
+  const [purchasedItems, setPurchasedItems] = useState([]);
 
   async function getData() {
     const token = await getToken();
@@ -38,6 +39,20 @@ function ShopScreen() {
       console.error('Error fetching user data:', error);
     }
   }
+
+  // //purchasing minigameshopitems
+  // async function purchaseItems() {
+  //   const purchasedItemsResponse = await fetchData(
+  //     '/purchaseminigameshopitem',
+  //     token,
+  //   );
+  //   setPurchasedItems(
+  //     purchasedItemsResponse.data.data.filter(
+  //       item => item.status === 'purchased',
+  //     ),
+  //   );
+  //   console.log(purchasedItemsResponse.data.data);
+  // }
 
   useEffect(() => {
     getData();
@@ -76,6 +91,32 @@ function ShopScreen() {
       </TouchableOpacity>
     </View>
   );
+
+  const renderItem = ({item}) => {
+    const isPurchased = purchasedItems.some(
+      purchased => purchased.id === item.id,
+    );
+    return (
+      <View style={[styles.itemContainer, isPurchased && styles.grayedOut]}>
+        <Text>{item.name}</Text>
+        <TouchableOpacity
+          style={[styles.button, isPurchased && styles.disabledButton]}
+          disabled={isPurchased}
+          onPress={() => handlePurchase(item.id)}>
+          <Text style={styles.buttonText}>
+            {isPurchased ? 'Purchased' : 'Buy'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const handlePurchase = async itemId => {
+    // Logic to handle purchasing the item
+    // After purchase, refresh data to update purchased items
+    await purchaseItem(itemId); // Assume this is an API call to purchase
+    getData(); // Refresh data to update the list
+  };
 
   return (
     <View style={styles.container}>

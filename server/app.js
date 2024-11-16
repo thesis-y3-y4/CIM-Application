@@ -1046,10 +1046,8 @@ app.post("/purchaseminigameshopitem", authenticateToken, async (req, res) => {
     const user = req.user;
 
     // Determine user model
-    let userDocument;
-    if (user instanceof userModel) {
-      userDocument = await userModel.findById(user._id);
-    } else if (user instanceof mobileUserModel) {
+    let userDocument = await userModel.findById(user._id);
+    if (!userDocument) {
       userDocument = await mobileUserModel.findById(user._id);
     } else {
       return res.status(400).json({ message: "Unknown user type" });
@@ -1075,12 +1073,10 @@ app.post("/purchaseminigameshopitem", authenticateToken, async (req, res) => {
 
     await userDocument.save();
 
-    res
-      .status(200)
-      .json({
-        message: "Item purchased successfully",
-        clawMarks: userDocument.clawMarks,
-      });
+    res.status(200).json({
+      message: "Item purchased successfully",
+      clawMarks: userDocument.clawMarks,
+    });
   } catch (error) {
     console.error("Error purchasing minigame shop item:", error);
     res.status(500).json({ message: "Error purchasing minigame shop item" });

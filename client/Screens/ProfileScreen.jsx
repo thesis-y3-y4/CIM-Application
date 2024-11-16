@@ -36,6 +36,7 @@ function ProfileScreen(props) {
   const [userData, setUserData] = useState('');
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [purchasedItems, setPurchasedItems] = useState([]);
 
   async function getData() {
     const token = await getToken();
