@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  Modal,
+  FlatList,
 } from 'react-native';
 import React, {useEffect, useState, useCallback} from 'react';
 import Toast from 'react-native-toast-message';
@@ -33,6 +35,7 @@ function ProfileScreen(props) {
   const navigation = useNavigation();
   const [userData, setUserData] = useState('');
   const [shouldRefresh, setShouldRefresh] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   async function getData() {
     const token = await getToken();
@@ -134,6 +137,14 @@ function ProfileScreen(props) {
     1,
   );
 
+  const handleOpenModal = () => {
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View>
@@ -156,6 +167,40 @@ function ProfileScreen(props) {
             style={{marginTop: -105}}
             source={require('../assets/wave.png')}
           />
+
+          <TouchableOpacity
+            style={styles.framesButton}
+            onPress={() => setModalVisible(true)}>
+            <Icon5 name="images" size={30} color={'white'} />
+          </TouchableOpacity>
+
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Unlocked Frames</Text>
+                {/* Add a list or grid of frames here */}
+
+                <FlatList
+                  data={frames}
+                  renderItem={({item}) => (
+                    <View style={styles.frameContainer}>
+                      <Image source={item.image} style={styles.frameImage} />
+                      <Text style={styles.frameName}>{item.name}</Text>
+                    </View>
+                  )}
+                  keyExtractor={item => item.id}
+                  numColumns={2}
+                />
+                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                  <Text style={styles.closeModal}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </View>
 
         <View style={{alignItems: 'center', position: 'relative'}}>
@@ -170,26 +215,21 @@ function ProfileScreen(props) {
                   : require('../assets/default-profile.jpg')
               }
             />
-            <Image
-              source={require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_5.png')}
-              // source={require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_4.png')}
-              // source={require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_5.png')}
+            {/* <Image
+              // source={require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_5.png')}
               style={styles.frameImage}
-            />
+            /> */}
           </TouchableOpacity>
         </View>
 
-        <View style={{marginHorizontal: 25, marginTop: 20}}>
+        <View style={{marginHorizontal: 25, marginTop: 10}}>
           <View
             style={{
-              marginTop: 5,
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            <Text style={[styles.nameText, {textAlignVertical: 'center'}]}>
-              {userData.name || ''}
-            </Text>
+            <Text style={[styles.nameText]}>{userData.name || ''}</Text>
             <Image source={emblem} style={{width: 40, height: 40}} />
           </View>
 
@@ -406,13 +446,12 @@ const styles = StyleSheet.create({
   },
   avatar: {
     borderRadius: 100,
-    marginTop: -220,
+    marginTop: -230,
     backgroundColor: 'white',
     height: 200,
     width: 200,
     padding: 10,
     borderColor: '#cccccc',
-    borderWidth: 1,
     elevation: 4,
     justifyContent: 'center',
     alignItems: 'center',
@@ -471,6 +510,46 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 18,
     fontWeight: '500',
+  },
+
+  //Modal
+  container: {
+    flex: 1,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 15,
+    left: 15,
+    zIndex: 1,
+  },
+  framesButton: {
+    position: 'absolute',
+    top: 15,
+    right: 15,
+    zIndex: 1,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '80%',
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  closeModal: {
+    fontSize: 16,
+    color: 'green',
+    marginTop: 20,
   },
 });
 

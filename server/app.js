@@ -1029,14 +1029,75 @@ app.get("/frienddata/:friendId", authenticateToken, async (req, res) => {
   }
 });
 
-//fetch all minigameshopitem
+//Fetch all minigameshopitem
 app.get("/minigameshopitems", async (req, res) => {
   try {
-    // Fetch all MinigameShopItem documents
     const items = await minigameShopItemModel.find();
     res.status(200).json(items);
   } catch (error) {
     res.status(500).json({ message: "Error fetching items", error });
+  }
+});
+
+//user || mobileUser can purchase minigameshopitem and will update the user.purchasedShopItems or mobileUser.purchasedShopItems
+app.post("/purchaseminigameshopitem", authenticateToken, async (req, res) => {
+  try {
+    const { shopItemId } = req.body;
+    const user = req.user;
+
+    // Determine user model
+    let userDocument;
+    if (user instanceof userModel) {
+      userDocument = await userModel.findById(user._id);
+    } else if (user instanceof mobileUserModel) {
+      userDocument = await mobileUserModel.findById(user._id);
+    } else {
+      return res.status(400).json({ message: "Unknown user type" });
+    }
+
+    if (!userDocument) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const item = await minigameShopItemModel.findById(shopItemId);
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    // Check if the user has enough claw marks
+    if (userDocument.clawMarks < item.price) {
+      return res.status(400).json({ message: "Not enough claw marks" });
+    }
+
+    // Deduct claw marks and add item to purchasedShopItems
+    userDocument.clawMarks -= item.price;
+    userDocument.purchasedShopItems.push(item._id);
+
+    await userDocument.save();
+
+    res
+      .status(200)
+      .json({
+        message: "Item purchased successfully",
+        clawMarks: userDocument.clawMarks,
+      });
+  } catch (error) {
+    console.error("Error purchasing minigame shop item:", error);
+    res.status(500).json({ message: "Error purchasing minigame shop item" });
+  }
+});
+
+//Get all of the user.purchasedShopItems or mobileUser.purchasedShopItems
+app.get("/purchasedminigameshopitems", authenticateToken, async (req, res) => {
+  try {
+    const user = req.user;
+    const purchasedItems = await minigameShopItemModel.find({
+      _id: { $in: user.purchasedShopItems },
+    });
+    res.status(200).json(purchasedItems);
+  } catch (error) {
+    console.error("Error fetching purchased minigame shop items:", error);
+    res.status(500).json({ message: "Error fetching purchased items" });
   }
 });
 

@@ -1,131 +1,25 @@
+import React, {useEffect, useState} from 'react';
 import {
   Text,
   View,
-  ScrollView,
   StyleSheet,
   Image,
   TouchableOpacity,
   FlatList,
   Alert,
+  Modal,
 } from 'react-native';
-import React from 'react';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import {useEffect, useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import NavigationBar from './components/NavigationBar';
-
-// import styles from './styles';
 import {fetchData} from './api/api';
-import {getToken} from './api/tokenStorage';
-
-// const frames = {
-//   cub: [
-//     {
-//       id: 'cub_frame1',
-//       name: 'Cub Frame 1',
-//       cost: 100,
-//       image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_1.png'),
-//     },
-//     {
-//       id: 'cub_frame2',
-//       name: 'Cub Frame 2',
-//       cost: 200,
-//       image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_2.png'),
-//     },
-//     {
-//       id: 'cub_frame3',
-//       name: 'Cub Frame 3',
-//       cost: 200,
-//       image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_3.png'),
-//     },
-//     {
-//       id: 'cub_frame4',
-//       name: 'Cub Frame 4',
-//       cost: 200,
-//       image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_4.png'),
-//     },
-//     {
-//       id: 'cub_frame5',
-//       name: 'Cub Frame 5',
-//       cost: 200,
-//       image: require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_5.png'),
-//     },
-//   ],
-//   juvenile: [
-//     {
-//       id: 'juvenile_frame1',
-//       name: 'Juvenile Frame 1',
-//       cost: 500,
-//       image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_1.png'),
-//     },
-//     {
-//       id: 'juvenile_frame2',
-//       name: 'Juvenile Frame 2',
-//       cost: 500,
-//       image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_2.png'),
-//     },
-//     {
-//       id: 'juvenile_frame3',
-//       name: 'Juvenile Frame 3',
-//       cost: 500,
-//       image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_3.png'),
-//     },
-//     {
-//       id: 'juvenile_frame4',
-//       name: 'Juvenile Frame 4',
-//       cost: 500,
-//       image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_4.png'),
-//     },
-//     {
-//       id: 'juvenile_frame5',
-//       name: 'Juvenile Frame 5',
-//       cost: 500,
-//       image: require('../assets/tier_list/JuvenileFrames/JUVENILE_TIER_FRAMES_5.png'),
-//     },
-//   ],
-//   wildcat: [
-//     {
-//       id: 'wildcat_frame1',
-//       name: 'Wildcat Frame 1',
-//       cost: 2000,
-//       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_1.png'),
-//     },
-//     {
-//       id: 'wildcat_frame2',
-//       name: 'Wildcat Frame 2',
-//       cost: 2000,
-//       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_2.png'),
-//     },
-//     {
-//       id: 'wildcat_frame3',
-//       name: 'Wildcat Frame 3',
-//       cost: 2000,
-//       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_3.png'),
-//     },
-//     {
-//       id: 'wildcat_frame4',
-//       name: 'Wildcat Frame 4',
-//       cost: 2000,
-//       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_4.png'),
-//     },
-//     {
-//       id: 'wildcat_frame5',
-//       name: 'Wildcat Frame 5',
-//       cost: 2000,
-//       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_5.png'),
-//     },
-//     {
-//       id: 'wildcat_frame6',
-//       name: 'Wildcat Frame 6',
-//       cost: 2000,
-//       image: require('../assets/tier_list/WildcatTier/WILDCAT_TIER_FRAME_6.png'),
-//     },
-//   ],
-// };
+import {getToken} from './api/tokenStorage.js';
 
 function ShopScreen() {
   const navigation = useNavigation();
   const [userData, setUserData] = useState('');
   const [allFrames, setAllFrames] = useState([]);
+  const [selectedFrame, setSelectedFrame] = useState(null); // State for selected frame
+  const [isModalVisible, setModalVisible] = useState(false); // State for modal visibility
 
   async function getData() {
     const token = await getToken();
@@ -133,8 +27,13 @@ function ShopScreen() {
       const response = await fetchData('/userdata', token);
       setUserData(response.data.data);
 
-      const framesResponse = await fetchData('/minigameshopitems', token);
-      setFrames(framesResponse.data);
+      // Fetch minigame shop items
+      const framesResponse = await fetchData(
+        '/minigameshopitems',
+        token,
+        'GET',
+      );
+      setAllFrames(framesResponse.data);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -142,38 +41,37 @@ function ShopScreen() {
 
   useEffect(() => {
     getData();
-
-    // Combine all frames into one array for the FlatList
-    const combinedFrames = [
-      ...frames.cub.map(frame => ({...frame, tier: 'Cub'})),
-      ...frames.juvenile.map(frame => ({...frame, tier: 'Juvenile'})),
-      ...frames.wildcat.map(frame => ({...frame, tier: 'Wildcat'})),
-    ];
-    setAllFrames(combinedFrames);
   }, []);
 
-  const purchaseFrame = frameCost => {
-    if (userData.clawMarks >= frameCost) {
+  const openPurchaseModal = frame => {
+    setSelectedFrame(frame);
+    setModalVisible(true);
+  };
+
+  const confirmPurchase = () => {
+    if (userData.clawMarks >= selectedFrame.price) {
       Alert.alert(
         'Purchase Successful!',
-        `You have unlocked the frame for ${frameCost} Claw Marks.`,
+        `You have unlocked the frame for ${selectedFrame.price} Claw Marks.`,
       );
+      setModalVisible(false);
     } else {
       Alert.alert(
         'Insufficient Claw Marks',
         'You do not have enough claw marks to unlock this frame.',
       );
+      setModalVisible(false);
     }
   };
 
   const renderFrame = ({item}) => (
     <View style={styles.frameCard}>
-      <Image source={item.image} style={styles.frameImage} />
+      <Image source={{uri: item.picture}} style={styles.frameImage} />
       <Text style={styles.frameName}>{item.name}</Text>
-      <Text style={styles.frameCost}>{item.cost} Claw Marks</Text>
+      <Text style={styles.frameCost}>{item.price} Claw Marks</Text>
       <TouchableOpacity
         style={styles.purchaseButton}
-        onPress={() => purchaseFrame(item.cost)}>
+        onPress={() => openPurchaseModal(item)}>
         <Text style={styles.purchaseButtonText}>Unlock</Text>
       </TouchableOpacity>
     </View>
@@ -182,20 +80,58 @@ function ShopScreen() {
   return (
     <View style={styles.container}>
       <NavigationBar navigation={navigation} />
-
       <View style={styles.contentContainer}>
         <Text style={styles.title}>Shop</Text>
         <FlatList
           data={allFrames}
-          keyExtractor={item => item.id}
-          renderItem={({item}) => (
-            <View style={styles.frameCard}>
-              <Image source={{uri: item.imageUrl}} style={styles.frameImage} />
-              <Text style={styles.frameName}>{item.name}</Text>
-            </View>
-          )}
+          keyExtractor={item => item._id}
+          renderItem={renderFrame}
+          contentContainerStyle={styles.flatListContent}
+          numColumns={2}
+          columnWrapperStyle={styles.columnWrapper}
         />
       </View>
+
+      {/* Purchase Confirmation Modal */}
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={isModalVisible}
+        onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Confirm Purchase</Text>
+            {userData.profilePicture && (
+              <View style={styles.previewContainer}>
+                <Image
+                  source={{uri: userData.profilePicture}}
+                  style={styles.profileImage}
+                />
+                <Image
+                  source={{uri: selectedFrame?.picture}}
+                  style={styles.frameOverlay}
+                />
+              </View>
+            )}
+            <Text style={styles.modalText}>
+              Unlock "{selectedFrame?.name}" for {selectedFrame?.price} Claw
+              Marks?
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.confirmButton}
+                onPress={confirmPurchase}>
+                <Text style={styles.buttonText}>Yes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setModalVisible(false)}>
+                <Text style={styles.buttonText}>No</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -203,67 +139,141 @@ function ShopScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#f7f7f7',
   },
   contentContainer: {
     flex: 1,
+    paddingVertical: 10,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'green',
-    marginVertical: 15,
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#2e7d32',
+    marginVertical: 10,
     textAlign: 'center',
-  },
-  frameRow: {
-    justifyContent: 'space-between',
   },
   flatListContent: {
     paddingHorizontal: 10,
+    paddingBottom: 20,
+  },
+  columnWrapper: {
+    justifyContent: 'space-between',
   },
   frameCard: {
     flex: 1,
     backgroundColor: 'white',
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'grey',
-    padding: 10,
+    borderColor: '#dcdcdc',
+    padding: 15,
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
     marginHorizontal: 5,
   },
   frameImage: {
-    width: 100,
-    height: 100,
+    width: 90,
+    height: 90,
     marginBottom: 10,
-    resizeMode: 'contain',
+    borderRadius: 8,
+    resizeMode: 'cover',
   },
   frameName: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'black',
+    color: '#333',
     textAlign: 'center',
+    marginBottom: 5,
   },
   frameCost: {
     fontSize: 14,
-    color: 'grey',
-    marginBottom: 5,
+    color: '#555',
+    marginBottom: 10,
   },
   purchaseButton: {
-    backgroundColor: 'green',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 5,
+    backgroundColor: '#4caf50',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+  },
+  modalText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+    marginTop: 20,
   },
   purchaseButtonText: {
     color: 'white',
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    justifyContent: 'center',
+    height: 320,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 10,
+    color: '#2e7d32',
+  },
+  previewContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 5,
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: '#555',
+  },
+  frameOverlay: {
+    width: 150,
+    height: 150,
+    position: 'absolute',
+    borderRadius: 60,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    marginTop: 15,
+    justifyContent: 'center',
+  },
+  confirmButton: {
+    backgroundColor: '#4caf50',
+    padding: 10,
+    borderRadius: 6,
+    marginRight: 10,
+  },
+  cancelButton: {
+    backgroundColor: '#f44336',
+    padding: 10,
+    borderRadius: 6,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: '700',
+    textAlign: 'center',
   },
 });
 
