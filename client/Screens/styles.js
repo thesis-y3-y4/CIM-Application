@@ -356,17 +356,32 @@ const styles = StyleSheet.create({
   communityCard: {
     width: '30%',
     height: 150,
-    justifyContent: 'center',
-    alignItems: 'center',
     borderRadius: 10,
     margin: 5,
     marginBottom: 10,
+    overflow: 'hidden',
   },
-  communityName: {
-    fontSize: 18,
+  logoContainer: {
+    padding: 8,
+    minWidth: '100%',
+    minHeight: '70%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imageBackground: {
+    flex: 1,
+    minWidth: '100%',
+    justifyContent: 'flex-end', 
+    alignItems: 'center', 
+    borderRadius: 75,
+    overflow: 'hidden', 
+  },
+  comName: {
+    fontSize: 12,
     fontWeight: 'bold',
     color: 'darkgreen',
-    padding: 10,
+    marginTop: -4,
+    padding: 4,
     textAlign: 'center',
   },
   communitySearchBar: {
