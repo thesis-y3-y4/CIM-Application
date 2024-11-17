@@ -69,6 +69,10 @@ const mobileUserSchema = new Schema({
       ref: "MinigameShopItem",
     },
   ],
+  selectedFrame: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "MinigameShopItem",
+  },
 });
 
 mobileUserSchema.virtual("relevantFields").get(function () {

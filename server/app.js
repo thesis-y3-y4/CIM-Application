@@ -1123,6 +1123,37 @@ app.get(
   }
 );
 
+//To update the user.selectedFrame || mobileUser.selectedFrame
+app.post(
+  "/update-selectedframe/:user_id",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { user_id } = req.params;
+      const { selectedFrame } = req.body;
+
+      // First check for the regular user model
+      let userDocument = await userModel.findById(user_id);
+      if (!userDocument) {
+        // If not found, check the mobile user model
+        userDocument = await mobileUserModel.findById(user_id);
+      }
+
+      if (!userDocument) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      userDocument.selectedFrame = selectedFrame;
+      await userDocument.save();
+
+      res.status(200).json({ message: "Frame updated successfully" });
+    } catch (error) {
+      console.error("Error updating selected frame:", error);
+      res.status(500).json({ message: "Error updating selected frame" });
+    }
+  }
+);
+
 app.listen("8001", () => {
   console.log("NodeJS Server is running on port 8001");
 });

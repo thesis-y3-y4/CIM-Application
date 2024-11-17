@@ -69,6 +69,10 @@ const userSchema = new Schema({
       ref: "MinigameShopItem",
     },
   ],
+  selectedFrame: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "MinigameShopItem",
+  },
 });
 
 const UserModel = mongoose.model("User", userSchema);

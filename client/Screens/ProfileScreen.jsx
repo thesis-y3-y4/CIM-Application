@@ -28,6 +28,7 @@ import {
 import {fetchData, updateProfilePicture} from './api/api';
 import {getToken} from './api/tokenStorage';
 import storage from '@react-native-firebase/storage';
+import PurchasedItemsModal from './components/PurchasedItemsModal.js';
 
 const {width: screenWidth} = Dimensions.get('window');
 
@@ -37,6 +38,7 @@ function ProfileScreen(props) {
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [purchasedItems, setPurchasedItems] = useState([]);
+  const [selectedFrame, setSelectedFrame] = useState(null);
 
   async function getData() {
     const token = await getToken();
@@ -47,7 +49,9 @@ function ProfileScreen(props) {
       try {
         const response = await fetchData('/userdata', token);
         setUserData(response.data.data);
-        fetchPurchasedItems(response.data.data._id);
+        setSelectedFrame(userData.selectedFrame);
+        console.log(selectedFrame);
+        fetchPurchasedItems(userData._id);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -155,11 +159,24 @@ function ProfileScreen(props) {
   );
 
   const handleOpenModal = () => {
-    setModalVisible(true);
+    fetchPurchasedItems(userData._id).then(() => {
+      setModalVisible(true);
+    });
   };
 
   const handleCloseModal = () => {
     setModalVisible(false);
+  };
+
+  const handleSelectFrame = async frameUri => {
+    setSelectedFrame(frameUri);
+    setModalVisible(false);
+
+    // API call to update the selected frame in the database
+    const token = await getToken();
+    await fetchData(`/update-selectedframe/${userData._id}`, token, 'POST', {
+      selectedFrame: frameUri,
+    });
   };
 
   return (
@@ -191,39 +208,16 @@ function ProfileScreen(props) {
             <Icon5 name="images" size={30} color={'white'} />
           </TouchableOpacity>
 
-          <Modal
-            animationType="slide"
-            transparent={true}
+          <PurchasedItemsModal
             visible={modalVisible}
-            onRequestClose={handleCloseModal}>
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Unlocked Minigame Items</Text>
-
-                <FlatList
-                  data={purchasedItems}
-                  renderItem={({item}) => (
-                    <View style={styles.itemContainer}>
-                      <Image
-                        source={{uri: item.imageUrl}}
-                        style={styles.itemImage}
-                      />
-                      <Text style={styles.itemName}>{item.name}</Text>
-                    </View>
-                  )}
-                  keyExtractor={item => item._id}
-                  numColumns={2}
-                />
-                <TouchableOpacity onPress={handleCloseModal}>
-                  <Text style={styles.closeModal}>Close</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
+            onClose={handleCloseModal}
+            purchasedItems={purchasedItems}
+            onSelect={handleSelectFrame}
+          />
         </View>
-        
-        <View style={{alignItems: 'center', position: 'relative'}}>
-          {/* <View style={{alignItems: 'center'}}> */}
+
+        {/* <View style={{alignItems: 'center', position: 'relative'}}> */}
+        <View style={{alignItems: 'center'}}>
           <TouchableOpacity onPress={handleImagePick}>
             <Avatar.Image
               size={180}
@@ -234,10 +228,9 @@ function ProfileScreen(props) {
                   : require('../assets/default-profile.jpg')
               }
             />
-            {/* <Image
-              // source={require('../assets/tier_list/Cubframes/CUB_TIER_FRAME_5.png')}
-              style={styles.frameImage}
-            /> */}
+            {selectedFrame && (
+              <Image source={{uri: selectedFrame}} style={styles.frameImage} />
+            )}
           </TouchableOpacity>
         </View>
 
@@ -532,43 +525,11 @@ const styles = StyleSheet.create({
   },
 
   //Modal
-  container: {
-    flex: 1,
-  },
-  backButton: {
-    position: 'absolute',
-    top: 15,
-    left: 15,
-    zIndex: 1,
-  },
   framesButton: {
     position: 'absolute',
     top: 15,
     right: 15,
     zIndex: 1,
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    width: '80%',
-    padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  closeModal: {
-    fontSize: 16,
-    color: 'green',
-    marginTop: 20,
   },
 });
 
