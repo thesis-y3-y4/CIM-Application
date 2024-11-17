@@ -100,7 +100,7 @@ function ShopScreen() {
 
     try {
       const response = await fetchData(
-        `/purchaseminigameshopitem/${userData._id}`,
+        `/purchase-minigameshopitem/${userData._id}`,
         token,
         'POST',
         {shopItemId: itemId},

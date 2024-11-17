@@ -183,9 +183,8 @@ function ProfileScreen(props) {
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
                 <Text style={styles.modalTitle}>Unlocked Frames</Text>
-                {/* Add a list or grid of frames here */}
 
-                <FlatList
+                {/* <FlatList
                   data={frames}
                   renderItem={({item}) => (
                     <View style={styles.frameContainer}>
@@ -195,7 +194,7 @@ function ProfileScreen(props) {
                   )}
                   keyExtractor={item => item.id}
                   numColumns={2}
-                />
+                /> */}
                 <TouchableOpacity onPress={() => setModalVisible(false)}>
                   <Text style={styles.closeModal}>Close</Text>
                 </TouchableOpacity>

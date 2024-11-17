@@ -1039,9 +1039,9 @@ app.get("/minigameshopitems", async (req, res) => {
   }
 });
 
-//user || mobileUser can purchase minigameshopitem and will update the user.purchasedShopItems or mobileUser.purchasedShopItems
+//Purchase minigameshopitem
 app.post(
-  "/purchaseminigameshopitem/:user_id",
+  "/purchase-minigameshopitem/:user_id",
   authenticateToken,
   async (req, res) => {
     try {
@@ -1094,18 +1094,37 @@ app.post(
 );
 
 //Get all of the user.purchasedShopItems or mobileUser.purchasedShopItems
-app.get("/purchasedminigameshopitems", authenticateToken, async (req, res) => {
-  try {
-    const user = req.user;
-    const purchasedItems = await minigameShopItemModel.find({
-      _id: { $in: user.purchasedShopItems },
-    });
-    res.status(200).json(purchasedItems);
-  } catch (error) {
-    console.error("Error fetching purchased minigame shop items:", error);
-    res.status(500).json({ message: "Error fetching purchased items" });
+app.get(
+  "/purchased-minigameshopitems/:user_id",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { user_id } = req.params; // Get user_id from the request parameters
+
+      // First check for the regular user model
+      let userDocument = await userModel.findById(user_id);
+      if (!userDocument) {
+        // If not found, check the mobile user model
+        userDocument = await mobileUserModel.findById(user_id);
+      }
+
+      if (!userDocument) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Fetch the purchased items from the shop
+      const purchasedItems = await minigameShopItemModel.find({
+        _id: { $in: userDocument.purchasedShopItems }, // Ensure you're fetching items the user has purchased
+      });
+
+      // Return the purchased items
+      res.status(200).json(purchasedItems);
+    } catch (error) {
+      console.error("Error fetching purchased minigame shop items:", error);
+      res.status(500).json({ message: "Error fetching purchased items" });
+    }
   }
-});
+);
 
 app.listen("8001", () => {
   console.log("NodeJS Server is running on port 8001");
