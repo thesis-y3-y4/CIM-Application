@@ -27,7 +27,6 @@ function ShopScreen() {
     try {
       const response = await fetchData('/userdata', token);
       setUserData(response.data.data);
-      console.log(response.data.data._id);
       // Fetch minigame shop items
       const framesResponse = await fetchData(
         '/minigameshopitems',
@@ -40,20 +39,6 @@ function ShopScreen() {
     }
   }
 
-  // //purchasing minigameshopitems
-  // async function purchaseItems() {
-  //   const purchasedItemsResponse = await fetchData(
-  //     '/purchaseminigameshopitem',
-  //     token,
-  //   );
-  //   setPurchasedItems(
-  //     purchasedItemsResponse.data.data.filter(
-  //       item => item.status === 'purchased',
-  //     ),
-  //   );
-  //   console.log(purchasedItemsResponse.data.data);
-  // }
-
   useEffect(() => {
     getData();
   }, []);
@@ -64,19 +49,9 @@ function ShopScreen() {
   };
 
   const confirmPurchase = () => {
-    if (userData.clawMarks >= selectedFrame.price) {
-      Alert.alert(
-        'Purchase Successful!',
-        `You have unlocked the frame for ${selectedFrame.price} Claw Marks.`,
-      );
-      setModalVisible(false);
-    } else {
-      Alert.alert(
-        'Insufficient Claw Marks',
-        'You do not have enough claw marks to unlock this frame.',
-      );
-      setModalVisible(false);
-    }
+    handlePurchase(selectedFrame._id);
+    console.log('Purchased:', selectedFrame._id);
+    setModalVisible(false);
   };
 
   const renderFrame = ({item}) => (
@@ -112,10 +87,32 @@ function ShopScreen() {
   };
 
   const handlePurchase = async itemId => {
-    // Logic to handle purchasing the item
-    // After purchase, refresh data to update purchased items
-    await purchaseItem(itemId); // Assume this is an API call to purchase
-    getData(); // Refresh data to update the list
+    const token = await getToken();
+    console.log('USER ID:', userData._id);
+    console.log('ITEM ID:', itemId);
+    try {
+      const response = await fetchData(
+        `/purchaseminigameshopitem/${userData._id}`,
+        token,
+        'POST',
+        {shopItemId: itemId},
+      );
+
+      if (response.data) {
+        Alert.alert(
+          'Purchase Successful!',
+          `You have unlocked ${selectedFrame.name}.`,
+        );
+        getData();
+      } else {
+        Alert.alert('Purchase Failed', response.data.message);
+        console.log('Userdata_id:', userData._id);
+        console.log('Item ID:', itemId);
+      }
+    } catch (error) {
+      console.error('Error purchasing item:', error);
+      Alert.alert('Error', 'Failed to complete the purchase.');
+    }
   };
 
   return (

@@ -82,7 +82,7 @@ app.get("/", (req, res) => {
   res.send("Backend server is up and running!");
 });
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8001;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 app.post("/login-user", async (req, res) => {
@@ -1047,7 +1047,8 @@ app.post(
     try {
       const { shopItemId } = req.body;
       const user_id = req.params.user_id;
-
+      console.log("Request Params:", req.params);
+      console.log("Request Body:", req.body);
       // Find user in the user model or mobile user model
       let userDocument = await userModel.findById(user_id);
       if (!userDocument) {
