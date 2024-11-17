@@ -314,11 +314,11 @@ function CommunityDetailsScreen() {
               <Avatar.Image
                 size={50}
                 style={styles.avatar}
-                source={{
-                  uri: community.profilePicture
-                    ? community.profilePicture
-                    : 'https://www.kindpng.com/picc/m/75-753798_community-examples-icon-green-community-icon-hd-png.png',
-                }}
+                source={
+                  community.logo
+                    ? { uri: community.logo } 
+                    : require('../../assets/default-logo.png')
+                }
               />
               <Text style={styles.communityName}>{community.name}</Text>
             </View>

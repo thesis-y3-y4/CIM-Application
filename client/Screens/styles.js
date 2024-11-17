@@ -354,20 +354,38 @@ const styles = StyleSheet.create({
     width: '50%',
   },
   communityCard: {
-    width: '30%',
-    height: 150,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: '31%',
+    height: 155,
     borderRadius: 10,
-    margin: 5,
+    margin: 3,
     marginBottom: 10,
+    overflow: 'hidden',
   },
-  communityName: {
-    fontSize: 18,
+  logoContainer: {
+    padding: 8,
+    minWidth: '100%',
+    minHeight: '70%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imageBackground: {
+    flex: 1,
+    minWidth: '100%',
+    justifyContent: 'flex-end', 
+    alignItems: 'center', 
+    borderRadius: 75,
+    overflow: 'hidden', 
+  },
+  comName: {
+    fontSize: 14,
     fontWeight: 'bold',
-    color: 'darkgreen',
-    padding: 10,
+    color: '#063d08',
+    padding: 4,
     textAlign: 'center',
+    marginTop: -2,
+    lineHeight: 14.2,
+    textTransform: 'uppercase',
+    letterSpacing: -.5,
   },
   communitySearchBar: {
     height: 55,
@@ -379,7 +397,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 10,
   },
-
   //CommunityDetailsScreen
   containerCommunityName: {
     flexDirection: 'row',

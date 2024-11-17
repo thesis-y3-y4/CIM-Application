@@ -7,6 +7,7 @@ import {
   LayoutAnimation,
   UIManager,
   Platform,
+  ImageBackground,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
@@ -196,12 +197,12 @@ function CommunitiesScreen(props) {
     />
   );
 
-  const renderCommunityItem = ({item, index}) => (
+  const renderCommunityItem = ({ item, index }) => (
     <TouchableOpacity
       style={[
         styles.communityCard,
         {
-          backgroundColor: index % 2 === 0 ? '#f8ec2c' : '#40ac44',
+          backgroundColor: index % 2 === 0 ? '#f8ec2c' : '#40ac44', 
         },
       ]}
       onPress={() =>
@@ -209,11 +210,31 @@ function CommunitiesScreen(props) {
           communityId: item._id,
           userData: userData,
         })
-      }>
-      <Text style={styles.communityName}>{item.name}</Text>
+      }
+    >
+      <View style={styles.logoContainer}>
+        <ImageBackground
+          source={
+            item.logo
+              ? { uri: item.logo } 
+              : require('../../assets/default-logo.png')
+          }
+          style={styles.imageBackground}
+          imageStyle={{ resizeMode: 'cover' }}
+        >
+        </ImageBackground>
+      </View><View>
+        <Text
+          style={styles.comName}
+          numberOfLines={2} // Limits the text to one line
+          ellipsizeMode="tail" // Adds ellipsis at the end if the text overflows
+        >
+          {item.name}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
-
+  
   const handleSearchChange = text => {
     setSearchText(text);
     if (text === '') {
