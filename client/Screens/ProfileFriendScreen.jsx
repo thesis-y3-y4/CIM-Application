@@ -112,8 +112,8 @@ function ProfileFriendScreen(props) {
           />
         </View>
 
-        {/* <View style={{alignItems: 'center', position: 'relative'}}> */}
-        <View style={{alignItems: 'center'}}>
+        <View style={{alignItems: 'center', position: 'relative'}}>
+          {/* <View style={{alignItems: 'center'}}> */}
           <Avatar.Image
             size={180}
             style={styles.avatar}
@@ -123,6 +123,12 @@ function ProfileFriendScreen(props) {
                 : require('../assets/default-profile.jpg')
             }
           />
+          {friendData.selectedFrame && (
+            <Image
+              source={{uri: friendData.selectedFrame}}
+              style={styles.frameImage}
+            />
+          )}
         </View>
 
         <View style={{marginHorizontal: 25, marginTop: 20}}>
@@ -369,14 +375,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  frameImage: {
-    width: 300,
-    height: 300,
-    position: 'absolute',
-    top: -250,
-    left: -50,
-    zIndex: 0,
-  },
   nameText: {
     fontSize: 20,
     textAlignVertical: 'center',
@@ -423,6 +421,13 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 18,
     fontWeight: '500',
+  },
+  frameImage: {
+    width: 250,
+    height: 250,
+    position: 'absolute',
+    top: -240,
+    zIndex: 0,
   },
 });
 
