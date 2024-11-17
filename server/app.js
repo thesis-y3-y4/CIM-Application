@@ -1048,8 +1048,6 @@ app.post(
       const { shopItemId } = req.body;
       const user_id = req.params.user_id;
 
-      console.log("Request Params:", req.params);
-      console.log("Request Body:", req.body);
       // Find user in the user model or mobile user model
       let userDocument = await userModel.findById(user_id);
       if (!userDocument) {
@@ -1099,26 +1097,25 @@ app.get(
   authenticateToken,
   async (req, res) => {
     try {
-      const { user_id } = req.params; // Get user_id from the request parameters
+      const { user_id } = req.params;
 
       // First check for the regular user model
-      let userDocument = await userModel.findById(user_id);
+      let userDocument = await userModel
+        .findById(user_id)
+        .populate("purchasedShopItems");
       if (!userDocument) {
         // If not found, check the mobile user model
-        userDocument = await mobileUserModel.findById(user_id);
+        userDocument = await mobileUserModel
+          .findById(user_id)
+          .populate("purchasedShopItems");
       }
 
       if (!userDocument) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Fetch the purchased items from the shop
-      const purchasedItems = await minigameShopItemModel.find({
-        _id: { $in: userDocument.purchasedShopItems }, // Ensure you're fetching items the user has purchased
-      });
-
-      // Return the purchased items
-      res.status(200).json(purchasedItems);
+      // Return the populated items (with details)
+      res.status(200).json(userDocument.purchasedShopItems);
     } catch (error) {
       console.error("Error fetching purchased minigame shop items:", error);
       res.status(500).json({ message: "Error fetching purchased items" });

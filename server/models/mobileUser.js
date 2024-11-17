@@ -64,7 +64,10 @@ const mobileUserSchema = new Schema({
   clawMarks: { type: Number, default: 0 },
   //Frames that users purchaced ||  inventory
   purchasedShopItems: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "MinigameShopItems" },
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MinigameShopItem",
+    },
   ],
 });
 

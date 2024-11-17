@@ -47,11 +47,27 @@ function ProfileScreen(props) {
       try {
         const response = await fetchData('/userdata', token);
         setUserData(response.data.data);
+        fetchPurchasedItems(response.data.data._id);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
     }
   }
+
+  // Function to fetch purchased minigame items
+  const fetchPurchasedItems = async userId => {
+    try {
+      const token = await getToken();
+      const response = await fetchData(
+        `/purchased-minigameshopitems/${userId}`,
+        token,
+        'GET',
+      );
+      setPurchasedItems(response.data);
+    } catch (error) {
+      console.error('Error fetching purchased items:', error);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -171,7 +187,7 @@ function ProfileScreen(props) {
 
           <TouchableOpacity
             style={styles.framesButton}
-            onPress={() => setModalVisible(true)}>
+            onPress={handleOpenModal}>
             <Icon5 name="images" size={30} color={'white'} />
           </TouchableOpacity>
 
@@ -179,30 +195,33 @@ function ProfileScreen(props) {
             animationType="slide"
             transparent={true}
             visible={modalVisible}
-            onRequestClose={() => setModalVisible(false)}>
+            onRequestClose={handleCloseModal}>
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Unlocked Frames</Text>
+                <Text style={styles.modalTitle}>Unlocked Minigame Items</Text>
 
-                {/* <FlatList
-                  data={frames}
+                <FlatList
+                  data={purchasedItems}
                   renderItem={({item}) => (
-                    <View style={styles.frameContainer}>
-                      <Image source={item.image} style={styles.frameImage} />
-                      <Text style={styles.frameName}>{item.name}</Text>
+                    <View style={styles.itemContainer}>
+                      <Image
+                        source={{uri: item.imageUrl}}
+                        style={styles.itemImage}
+                      />
+                      <Text style={styles.itemName}>{item.name}</Text>
                     </View>
                   )}
-                  keyExtractor={item => item.id}
+                  keyExtractor={item => item._id}
                   numColumns={2}
-                /> */}
-                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                />
+                <TouchableOpacity onPress={handleCloseModal}>
                   <Text style={styles.closeModal}>Close</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </Modal>
         </View>
-
+        
         <View style={{alignItems: 'center', position: 'relative'}}>
           {/* <View style={{alignItems: 'center'}}> */}
           <TouchableOpacity onPress={handleImagePick}>
