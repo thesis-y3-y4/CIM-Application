@@ -70,8 +70,8 @@ const mobileUserSchema = new Schema({
     },
   ],
   selectedFrame: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "MinigameShopItem",
+    type: String,
+    required: false,
   },
 });
 

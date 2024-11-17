@@ -62,7 +62,6 @@ const userSchema = new Schema({
   },
   //points
   clawMarks: { type: Number, default: 0 },
-  //Frames that users purchaced ||  inventory
   purchasedShopItems: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -70,8 +69,8 @@ const userSchema = new Schema({
     },
   ],
   selectedFrame: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "MinigameShopItem",
+    type: String,
+    required: false,
   },
 });
 

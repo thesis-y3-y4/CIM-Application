@@ -49,9 +49,9 @@ function ProfileScreen(props) {
       try {
         const response = await fetchData('/userdata', token);
         setUserData(response.data.data);
-        setSelectedFrame(userData.selectedFrame);
-        console.log(selectedFrame);
-        fetchPurchasedItems(userData._id);
+        setSelectedFrame(response.data.data.selectedFrame);
+        console.log('Selected Frame:', selectedFrame);
+        fetchPurchasedItems(response.data.data._id);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -62,6 +62,7 @@ function ProfileScreen(props) {
   const fetchPurchasedItems = async userId => {
     try {
       const token = await getToken();
+      console.log('User ID:', userId);
       const response = await fetchData(
         `/purchased-minigameshopitems/${userId}`,
         token,
@@ -171,7 +172,7 @@ function ProfileScreen(props) {
   const handleSelectFrame = async frameUri => {
     setSelectedFrame(frameUri);
     setModalVisible(false);
-
+    console.log('Selected frame modal:', frameUri);
     // API call to update the selected frame in the database
     const token = await getToken();
     await fetchData(`/update-selectedframe/${userData._id}`, token, 'POST', {

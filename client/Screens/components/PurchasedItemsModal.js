@@ -22,7 +22,7 @@ function PurchasedItemsModal({visible, onClose, purchasedItems, onSelect}) {
           <ScrollView contentContainerStyle={styles.purchasedItemsContainer}>
             {purchasedItems.map(item => (
               <TouchableOpacity
-                key={item.id} // Unique key for each item
+                key={item.id} 
                 onPress={() => {
                   onSelect(item.picture);
                 }}>
