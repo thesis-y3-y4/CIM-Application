@@ -25,15 +25,25 @@ function ShopScreen() {
   async function getData() {
     const token = await getToken();
     try {
+      // Fetch user data
       const response = await fetchData('/userdata', token);
       setUserData(response.data.data);
+
       // Fetch minigame shop items
       const framesResponse = await fetchData(
         '/minigameshopitems',
         token,
         'GET',
       );
-      setAllFrames(framesResponse.data);
+
+      // Filter out items that have already been purchased
+      const purchasedItemIds = response.data.data.purchasedShopItems || [];
+      const availableFrames = framesResponse.data.filter(
+        frame => !purchasedItemIds.includes(frame._id),
+      );
+
+      setAllFrames(availableFrames);
+      setPurchasedItems(purchasedItemIds);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -50,7 +60,6 @@ function ShopScreen() {
 
   const confirmPurchase = () => {
     handlePurchase(selectedFrame._id);
-    console.log('Purchased:', selectedFrame._id);
     setModalVisible(false);
   };
 
@@ -77,7 +86,7 @@ function ShopScreen() {
         <TouchableOpacity
           style={[styles.button, isPurchased && styles.disabledButton]}
           disabled={isPurchased}
-          onPress={() => handlePurchase(item.id)}>
+          onPress={() => frchase(item.id)}>
           <Text style={styles.buttonText}>
             {isPurchased ? 'Purchased' : 'Buy'}
           </Text>
@@ -88,8 +97,6 @@ function ShopScreen() {
 
   const handlePurchase = async itemId => {
     const token = await getToken();
-    console.log('USER ID:', userData._id);
-    console.log('ITEM ID:', itemId);
 
     try {
       const response = await fetchData(
@@ -100,10 +107,25 @@ function ShopScreen() {
       );
 
       if (response.status === 200) {
-        setPurchasedItems(prevItems => [...prevItems, {shopItemId: itemId}]);
+        // Update purchased items and remove the purchased item from available items
+        setPurchasedItems(prevItems => [...prevItems, itemId]);
+        setAllFrames(prevFrames =>
+          prevFrames.filter(frame => frame._id !== itemId),
+        );
+
+        Alert.alert('Success', 'Item purchased successfully');
+      } else if (response.status === 400) {
+        Alert.alert(
+          'Insufficient Claw Marks',
+          'You do not have enough claw marks to purchase this item.',
+        );
       }
     } catch (error) {
       console.error('SHOP: Error purchasing item:', error);
+      Alert.alert(
+        'Error',
+        'An error occurred while attempting to purchase the item.',
+      );
     }
   };
 
