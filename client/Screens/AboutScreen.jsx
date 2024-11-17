@@ -5,11 +5,11 @@ import {
   StyleSheet,
   ImageBackground,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import NavigationBar from './components/NavigationBar';
-import { fetchData } from './api/api';
-import { getToken } from './api/tokenStorage';
+import {fetchData} from './api/api';
+import {getToken} from './api/tokenStorage';
 
 function AboutScreen(props) {
   const navigation = useNavigation();
@@ -32,13 +32,11 @@ function AboutScreen(props) {
 
   return (
     <ImageBackground
-      source={require('C:\\Users\\dyerm\\Documents\\CIM-Application\\client\\assets\\aboutpagebg.png')}
-      style={styles.backgroundImage}
-    >
+      source={require('../assets/aboutpagebg.png')}
+      style={styles.backgroundImage}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollViewContent}
-      >
+        contentContainerStyle={styles.scrollViewContent}>
         <View>
           <NavigationBar navigation={navigation} />
 
@@ -47,14 +45,17 @@ function AboutScreen(props) {
             <View>
               <Text style={styles.details1}>Welcome to the CIM App!</Text>
               <Text style={styles.details}>
-              CIM is an innovative application aimed at transforming the way information is shared
-              within the College of St. Catherine Quezon City. By consolidating announcements from 
-              diverse sources into a single platform, CIM guarantees seamless access to vital updates, 
-              ensuring stakeholders remain effortlessly informed.
+                CIM is an innovative application aimed at transforming the way
+                information is shared within the College of St. Catherine Quezon
+                City. By consolidating announcements from diverse sources into a
+                single platform, CIM guarantees seamless access to vital
+                updates, ensuring stakeholders remain effortlessly informed.
               </Text>
-              <Text style={styles.details2}>We extend our gratitude to the College of St. Catherine Quezon City 
-                and its stakeholders for their {"\n"}support and collaboration in the development of CIM.</Text>
-              
+              <Text style={styles.details2}>
+                We extend our gratitude to the College of St. Catherine Quezon
+                City and its stakeholders for their {'\n'}support and
+                collaboration in the development of CIM.
+              </Text>
             </View>
           </View>
         </View>
@@ -104,7 +105,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 30,
   },
-  footer:{
+  footer: {
     color: 'white',
     fontSize: 20,
     fontStyle: 'italic',
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     fontFamily: 'sans-serif',
     letterSpacing: 1,
     position: 'absolute',
-    bottom: 250,           // Distance from the bottom edge
+    bottom: 250, // Distance from the bottom edge
     right: 80,
     opacity: 0.7,
     textShadowColor: 'black',
