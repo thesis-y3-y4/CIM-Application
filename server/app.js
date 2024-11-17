@@ -1046,7 +1046,8 @@ app.post(
   async (req, res) => {
     try {
       const { shopItemId } = req.body;
-      const user_id = req.params.user_id;
+      const user_id = req.params;
+      
       console.log("Request Params:", req.params);
       console.log("Request Body:", req.body);
       // Find user in the user model or mobile user model

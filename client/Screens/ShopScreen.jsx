@@ -90,6 +90,7 @@ function ShopScreen() {
     const token = await getToken();
     console.log('USER ID:', userData._id);
     console.log('ITEM ID:', itemId);
+
     try {
       const response = await fetchData(
         `/purchaseminigameshopitem/${userData._id}`,
@@ -98,20 +99,13 @@ function ShopScreen() {
         {shopItemId: itemId},
       );
 
-      if (response.data) {
-        Alert.alert(
-          'Purchase Successful!',
-          `You have unlocked ${selectedFrame.name}.`,
-        );
-        getData();
+      if (response.status === 200) {
+        setPurchasedItems(prevItems => [...prevItems, {shopItemId: itemId}]);
       } else {
-        Alert.alert('Purchase Failed', response.data.message);
-        console.log('Userdata_id:', userData._id);
-        console.log('Item ID:', itemId);
+        console.log('Error purchasing item:', response.data);
       }
     } catch (error) {
       console.error('Error purchasing item:', error);
-      Alert.alert('Error', 'Failed to complete the purchase.');
     }
   };
 
