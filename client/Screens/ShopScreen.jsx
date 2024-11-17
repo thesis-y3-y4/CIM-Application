@@ -101,11 +101,9 @@ function ShopScreen() {
 
       if (response.status === 200) {
         setPurchasedItems(prevItems => [...prevItems, {shopItemId: itemId}]);
-      } else {
-        console.log('Error purchasing item:', response.data);
       }
     } catch (error) {
-      console.error('Error purchasing item:', error);
+      console.error('SHOP: Error purchasing item:', error);
     }
   };
 
