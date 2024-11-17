@@ -81,7 +81,8 @@ app.use(
 app.get("/", (req, res) => {
   res.send("Backend server is up and running!");
 });
-const PORT = process.env.PORT || 8001;
+
+const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 app.post("/login-user", async (req, res) => {
