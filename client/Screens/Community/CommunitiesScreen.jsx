@@ -7,7 +7,6 @@ import {
   LayoutAnimation,
   UIManager,
   Platform,
-  Image,
   ImageBackground,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
@@ -224,9 +223,14 @@ function CommunitiesScreen(props) {
           imageStyle={{ resizeMode: 'cover' }}
         >
         </ImageBackground>
-      </View>
-      <View>
-        <Text style={styles.comName}>{item.name}</Text>
+      </View><View>
+        <Text
+          style={styles.comName}
+          numberOfLines={2} // Limits the text to one line
+          ellipsizeMode="tail" // Adds ellipsis at the end if the text overflows
+        >
+          {item.name}
+        </Text>
       </View>
     </TouchableOpacity>
   );

@@ -354,10 +354,10 @@ const styles = StyleSheet.create({
     width: '50%',
   },
   communityCard: {
-    width: '30%',
-    height: 150,
+    width: '31%',
+    height: 155,
     borderRadius: 10,
-    margin: 5,
+    margin: 3,
     marginBottom: 10,
     overflow: 'hidden',
   },
@@ -377,12 +377,15 @@ const styles = StyleSheet.create({
     overflow: 'hidden', 
   },
   comName: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 'bold',
-    color: 'darkgreen',
-    marginTop: -4,
+    color: '#063d08',
     padding: 4,
     textAlign: 'center',
+    marginTop: -2,
+    lineHeight: 14.2,
+    textTransform: 'uppercase',
+    letterSpacing: -.5,
   },
   communitySearchBar: {
     height: 55,
@@ -394,7 +397,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 10,
   },
-
   //CommunityDetailsScreen
   containerCommunityName: {
     flexDirection: 'row',
