@@ -26,6 +26,7 @@ function CommunityDetailsScreen() {
   const [community, setCommunity] = useState(null);
   const [communityPosts, setCommunityPosts] = useState([]);
   const [forumPosts, setForumPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const [isMember, setIsMember] = useState(false);
   const [selectedMediaUrl, setSelectedMediaUrl] = useState('');
@@ -316,7 +317,7 @@ function CommunityDetailsScreen() {
                 style={styles.avatar}
                 source={
                   community.logo
-                    ? { uri: community.logo } 
+                    ? {uri: community.logo}
                     : require('../../assets/default-logo.png')
                 }
               />

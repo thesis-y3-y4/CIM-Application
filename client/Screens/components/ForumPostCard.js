@@ -7,6 +7,7 @@ import {
   Modal,
   TextInput,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import styles from '../styles';
@@ -43,6 +44,7 @@ const ForumPostCard = ({
     areFriends: false,
     isPending: false,
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
@@ -160,6 +162,7 @@ const ForumPostCard = ({
 
   const handleAddFriend = async recipientId => {
     const token = await getToken();
+    setLoading(true);
     try {
       const response = await fetchData('/sendfriendrequest', token, 'POST', {
         recipientId,
@@ -181,11 +184,14 @@ const ForumPostCard = ({
         text2: 'Failed to send friend request.',
         type: 'error',
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchFriendStatus = async (userId, friendId) => {
     const token = await getToken();
+    setLoading(true);
     try {
       const response = await fetchData(
         `/friendstatus/${userId}/${friendId}`,
@@ -196,6 +202,8 @@ const ForumPostCard = ({
       setFriendStatus(response.data);
     } catch (error) {
       console.error('Error fetching friend status:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -220,8 +228,13 @@ const ForumPostCard = ({
           !friendStatus.isPending && (
             <TouchableOpacity
               style={styles.addFriendButton}
-              onPress={() => handleAddFriend(post.postedBy)}>
-              <Text style={styles.addFriendButtonText}>Add Friend</Text>
+              onPress={() => handleAddFriend(post.postedBy)}
+              disabled={loading}>
+              {loading ? (
+                <ActivityIndicator size="small" color="green" />
+              ) : (
+                <Text style={styles.addFriendButtonText}>Add Friend</Text>
+              )}
             </TouchableOpacity>
           )}
         {friendStatus.areFriends && (
