@@ -139,9 +139,6 @@ function NotificationScreen(props) {
     try {
       const announcementsResponse = await fetchData('/announcedata', token);
       const announcements = announcementsResponse.data.announcements;
-      // console.log('Announcements Response:', announcements);
-      console.log('Announcements:', announcements);
-      console.log('Notification Header:', notification.announcementHeader);
 
       const matchingAnnouncement = announcements.find(
         announcement =>

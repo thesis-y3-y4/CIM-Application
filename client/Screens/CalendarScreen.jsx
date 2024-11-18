@@ -1,4 +1,11 @@
-import {Text, View, TouchableOpacity, ActivityIndicator} from 'react-native';
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  ActivityIndicator,
+  Modal,
+  Button,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import NavigationBar from './components/NavigationBar';
@@ -12,6 +19,8 @@ import moment from 'moment';
 function CalendarScreen(props) {
   const navigation = useNavigation();
   const [displayedEvents, setDisplayedEvents] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   async function getData() {
     try {
@@ -133,15 +142,15 @@ function CalendarScreen(props) {
       }
     };
 
-    const renderItem = items => {
+    const renderItem = item => {
       let avatarUri;
-      switch (items.eventType) {
+      switch (item.eventType) {
         case 'structural':
         case 'institutional':
           avatarUri = 'https://cscqcph.com/images/cscqcph.png';
           break;
         case 'organizational':
-          avatarUri = 'https://gcdnb.pbrd.co/images/jzLuZUcOOryY.png?o=1';
+          avatarUri = 'https://cscqcph.com/images/cscqcph.png';
           break;
         case 'specialized':
           avatarUri =
@@ -152,7 +161,12 @@ function CalendarScreen(props) {
       }
 
       return (
-        <TouchableOpacity style={{marginRight: 10, marginTop: 17}}>
+        <TouchableOpacity
+          style={{marginRight: 10, marginTop: 17}}
+          onPress={() => {
+            setSelectedEvent(item);
+            setModalVisible(true);
+          }}>
           <Card>
             <Card.Content>
               <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
@@ -164,14 +178,14 @@ function CalendarScreen(props) {
                 <View
                   style={{flexDirection: 'column', alignItems: 'flex-start'}}>
                   <Text style={[styles.details, {fontSize: 15, paddingTop: 5}]}>
-                    {moment(items.start).format('h:mm A')} -{' '}
-                    {moment(items.end).format('h:mm A')}
+                    {moment(item.start).format('h:mm A')} -{' '}
+                    {moment(item.end).format('h:mm A')}
                   </Text>
                   <Text style={[styles.details, {paddingTop: 7}]}>
-                    {items.title}
+                    {item.title}
                   </Text>
                   <Text style={[styles.details, {color: 'grey'}]}>
-                    {items.location}
+                    {item.location}
                   </Text>
                 </View>
               </View>
@@ -189,9 +203,35 @@ function CalendarScreen(props) {
           selected={new Date()}
           renderItem={renderItem}
           rowHasChanged={(r1, r2) => r1.text !== r2.text}
-          renderEmptyData={renderEmpty}
-          renderEmptyDate={renderEmpty}
         />
+
+        {/* Modal for Event Details */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}>
+          <View style={styles.modalCalendarContainer}>
+            <View style={styles.modalCalendarContent}>
+              {selectedEvent && (
+                <>
+                  <Text style={styles.modalTitle}>{selectedEvent.title}</Text>
+                  <Text style={styles.modalText}>
+                    Date: {moment(selectedEvent.start).format('MMMM D, YYYY')}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Time: {moment(selectedEvent.start).format('h:mm A')} -{' '}
+                    {moment(selectedEvent.end).format('h:mm A')}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Location: {selectedEvent.location}
+                  </Text>
+                </>
+              )}
+              <Button title="Close" onPress={() => setModalVisible(false)} />
+            </View>
+          </View>
+        </Modal>
       </View>
     );
   };

@@ -93,6 +93,32 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 12,
   },
+  //CalendarScreen
+  modalCalendarContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalCalendarContent: {
+    width: '80%',
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: 'darkgreen',
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: 'black',
+  },
+
   //NotificationScreen
   notificationText: {
     color: 'white',
