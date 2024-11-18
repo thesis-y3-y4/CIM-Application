@@ -2,7 +2,7 @@ import Matter from 'matter-js';
 import {Dimensions} from 'react-native';
 
 const windowWidth = Dimensions.get('window').width;
-const MAX_DELTA = 16.667;
+const MAX_DELTA = 15;
 
 const Physics = (entities, {touches, time, dispatch}) => {
   let engine = entities.physics.engine;

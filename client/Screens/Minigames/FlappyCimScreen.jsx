@@ -18,11 +18,13 @@ function FlappyCimScreen(props) {
   const {announcementId} = route.params;
   const navigation = useNavigation();
   const [userData, setUserData] = useState('');
-  const [running, setRunning] = useState(false);
   const [gameEngine, setGameEngine] = useState(null);
-  const [attempts, setAttempts] = useState(5);
-  const [gameResult, setGameResult] = useState(null);
-  const [gameOverHandled, setGameOverHandled] = useState(false);
+  const [gameState, setGameState] = useState({
+    running: false,
+    attempts: 5,
+    gameResult: null,
+    gameOverHandled: false,
+  });
 
   async function getData() {
     const token = await getToken();
@@ -50,11 +52,17 @@ function FlappyCimScreen(props) {
 
   useEffect(() => {
     getData();
-    setRunning(false);
-    if (attempts === 0) {
-      setGameResult('No attempts left!');
+    setGameState(prevState => ({
+      ...prevState,
+      running: false,
+    }));
+    if (gameState.attempts === 0) {
+      setGameState(prevState => ({
+        ...prevState,
+        gameResult: 'No attempts left!',
+      }));
     }
-  }, [attempts]);
+  }, [gameState.attempts]);
 
   function calculatePoints(attempts) {
     if (attempts === 0) {
@@ -76,11 +84,14 @@ function FlappyCimScreen(props) {
   async function submitGameResult(resultData) {
     const token = await getToken();
     const {result, points, FlappyCIM} = resultData;
+
+    // Ensure FlappyCIM is always defined and has the necessary properties
     const stats = {
       result,
       points,
-      FlappyCIM,
+      FlappyCIM: FlappyCIM || {tries: 0},
     };
+
     console.log('Stats:', stats);
     try {
       const response = await fetchData(`/playminigame`, token, 'POST', {
@@ -89,7 +100,7 @@ function FlappyCimScreen(props) {
         game: 'Flappy CIM',
         result,
         stats,
-        attempts: FlappyCIM.tries,
+        attempts: stats.FlappyCIM.tries, // Access FlappyCIM.tries safely
         points,
       });
       if (response.status === 201) {
@@ -101,24 +112,32 @@ function FlappyCimScreen(props) {
   }
 
   const resetGame = () => {
-    setGameResult(null);
-    setRunning(true);
-    setGameOverHandled(false); // Reset flag for the new game
+    setGameState(prevState => ({
+      ...prevState,
+      gameResult: null,
+      running: true,
+      gameOverHandled: false,
+    }));
     gameEngine.swap(entities());
   };
 
   const handleEvent = event => {
-    if (!gameOverHandled) {
+    if (!gameState.gameOverHandled) {
       switch (event.type) {
         case 'game_over':
-          setGameOverHandled(true); // Set flag to prevent further handling
-          setRunning(false);
+          setGameState(prevState => ({
+            ...prevState,
+            gameOverHandled: true,
+            running: false,
+          }));
 
           // If attempts are exhausted, show "No attempts left!" instead
-          if (attempts === 1) {
-            setAttempts(0);
-            console.log('Attempts:', attempts);
-            setGameResult('No attempts left!');
+          if (gameState.attempts === 1) {
+            setGameState(prevState => ({
+              ...prevState,
+              attempts: 0,
+              gameResult: 'No attempts left!',
+            }));
             submitGameResult({
               result: 'lose',
               points: 10,
@@ -131,25 +150,35 @@ function FlappyCimScreen(props) {
               navigation.navigate('AnnouncementPost', {
                 announcementId: announcementId,
               });
-              console.log('FlappyCIM announcementId:', announcementId);
             }, 3000);
           } else {
-            setAttempts(prev => prev - 1); // Decrement attempts
-            setGameResult('Attempt Failed');
+            setGameState(prevState => ({
+              ...prevState,
+              attempts: prevState.attempts - 1,
+              gameResult: 'Attempt Failed',
+            }));
           }
           break;
 
         case 'game_won':
-          setGameOverHandled(true);
-          setRunning(false);
-          setGameResult('You Win!');
-          submitGameResult('win');
+          setGameState(prevState => ({
+            ...prevState,
+            gameOverHandled: true,
+            running: false,
+            gameResult: 'You Win!',
+          }));
+          submitGameResult({
+            result: 'win',
+            points: calculatePoints(gameState.attempts),
+            FlappyCIM: {
+              tries: gameState.attempts,
+            },
+          });
 
           setTimeout(() => {
             navigation.navigate('AnnouncementPost', {
               announcementId: announcementId,
             });
-            console.log('FlappyCIM announcementId:', announcementId);
           }, 2000);
           break;
       }
@@ -157,18 +186,20 @@ function FlappyCimScreen(props) {
   };
 
   const startGame = () => {
-    if (attempts > 0) {
+    if (gameState.attempts > 0) {
       resetGame();
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.counter}>Attempts: {attempts}</Text>
+      <Text style={styles.counter}>Attempts: {gameState.attempts}</Text>
 
-      {gameResult && <Text style={styles.result}>{gameResult}</Text>}
+      {gameState.gameResult && (
+        <Text style={styles.result}>{gameState.gameResult}</Text>
+      )}
 
-      {attempts == 5 && (
+      {gameState.attempts === 5 && (
         <Text style={styles.rule}>
           Pass all the obstacles to view the surprises.
         </Text>
@@ -184,12 +215,12 @@ function FlappyCimScreen(props) {
           }}
           systems={[Physics]}
           entities={entities()}
-          running={running}
+          running={gameState.running}
           onEvent={handleEvent}
         />
       </ImageBackground>
 
-      {!running && attempts > 0 && (
+      {!gameState.running && gameState.attempts > 0 && (
         <View>
           <TouchableOpacity style={styles.button} onPress={startGame}>
             <Text style={styles.buttonText}>Press to Start</Text>
