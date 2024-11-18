@@ -1,17 +1,30 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {TouchableOpacity, View, Dimensions, Text} from 'react-native';
+import {
+  TouchableOpacity,
+  View,
+  Dimensions,
+  Text,
+  StyleSheet,
+  Modal,
+} from 'react-native';
 import Video from 'react-native-video';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Slider from '@react-native-community/slider';
 import Orientation from 'react-native-orientation-locker';
+
 const screen = Dimensions.get('screen');
+const screenWidth = Dimensions.get('window').width;
 
 const VideoControls = ({mediaUrl}) => {
-  const [vidPaused, setVidPaused] = useState(true);
   const ref = useRef();
+  const [vidPaused, setVidPaused] = useState(true);
   const [vidProgress, setVidProgress] = useState({currentTime: 0});
   const [vidFullScreen, setVidFullScreen] = useState(false);
   const [showControls, setShowControls] = useState(false);
+  const [videoAspectRatio, setVideoAspectRatio] = useState(1);
+  const [videoHeight, setVideoHeight] = useState(
+    Dimensions.get('window').width / 2.5,
+  );
 
   const format = seconds => {
     let mins = parseInt(seconds / 60)
@@ -40,144 +53,242 @@ const VideoControls = ({mediaUrl}) => {
     setShowControls(!showControls);
   };
 
+  const onVideoLoad = ({naturalSize}) => {
+    const aspectRatio = naturalSize.width / naturalSize.height;
+    setVideoAspectRatio(aspectRatio);
+
+    // Adjust height based on aspect ratio (for portrait or landscape)
+    const height = screenWidth / aspectRatio;
+    setVideoHeight(height);
+  };
+
+  const toggleFullScreen = () => {
+    setVidFullScreen(!vidFullScreen);
+    if (!vidFullScreen) {
+      if (videoAspectRatio > 1) {
+        Orientation.lockToLandscape();
+      } else {
+        Orientation.lockToPortrait();
+      }
+    } else {
+      Orientation.unlockAllOrientations();
+    }
+  };
+
+  const seekVideo = time => {
+    if (ref.current) {
+      ref.current.seek(time);
+    }
+  };
+
   return (
-    <View
-      style={{
-        width: '100%',
-        height: vidFullScreen ? '100%' : screen.width / 2.5,
-      }}>
-      <TouchableOpacity
-        style={{
-          width: '100%',
-          height: vidFullScreen ? '100%' : screen.width / 2.5,
-        }}
-        onPress={() => {
-          toggleControls();
-        }}>
+    <View style={[styles.videoContainer, {height: videoHeight}]}>
+      <TouchableOpacity style={styles.touchableVideo} onPress={toggleControls}>
         <Video
           paused={vidPaused}
-          source={{
-            uri: mediaUrl,
-          }}
+          source={{uri: mediaUrl}}
           ref={ref}
-          onProgress={x => {
-            setVidProgress(x);
-          }}
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
+          onProgress={x => setVidProgress(x)}
+          style={styles.video}
           resizeMode="contain"
+          onLoad={onVideoLoad}
           onEnd={() => {
             setVidPaused(true);
-            ref.current.seek(0);
+            seekVideo(0);
           }}
-          onPress={() => toggleControls()}
         />
 
-        {/* Controls */}
         {showControls && (
-          <TouchableOpacity
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-              backgroundColor: 'rgba(0,0,0,.5)',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <View style={{flexDirection: 'row'}}>
-              {/*  Rewind, Pause/Play, Fastforward */}
+          <TouchableOpacity style={styles.controlsOverlay}>
+            <View style={styles.controlsRow}>
               <TouchableOpacity
-                style={{marginRight: 50}}
-                onPress={() => {
-                  ref.current.seek(parseInt(vidProgress.currentTime) - 10);
-                }}>
+                style={styles.controlButton}
+                onPress={() =>
+                  seekVideo(parseInt(vidProgress.currentTime) - 10)
+                }>
                 <Icon name="rewind-outline" size={30} color="white" />
               </TouchableOpacity>
               <TouchableOpacity
-                style={{marginRight: 50}}
-                onPress={() => {
-                  setVidPaused(!vidPaused);
-                }}>
-                {vidPaused ? (
-                  <Icon name="play-circle" size={35} color="white" />
-                ) : (
-                  <Icon name="pause-circle" size={35} color="white" />
-                )}
+                style={styles.controlButton}
+                onPress={() => setVidPaused(!vidPaused)}>
+                <Icon
+                  name={vidPaused ? 'play-circle' : 'pause-circle'}
+                  size={35}
+                  color="white"
+                />
               </TouchableOpacity>
-
               <TouchableOpacity
-                onPress={() => {
-                  ref.current.seek(parseInt(vidProgress.currentTime) + 10);
-                }}>
+                onPress={() =>
+                  seekVideo(parseInt(vidProgress.currentTime) + 10)
+                }>
                 <Icon name="fast-forward-outline" size={30} color="white" />
               </TouchableOpacity>
             </View>
 
-            <View
-              style={{
-                width: '100%',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                position: 'absolute',
-                bottom: 0,
-                paddingLeft: 10,
-                paddingRight: 35,
-                alignItems: 'center',
-              }}>
-              <Text style={{color: 'white'}}>
+            <TouchableOpacity
+              onPress={toggleFullScreen}
+              style={styles.fullScreenButton}>
+              <Icon
+                name={vidFullScreen ? 'fullscreen-exit' : 'fullscreen'}
+                size={30}
+                color="white"
+              />
+            </TouchableOpacity>
+
+            <View style={styles.sliderContainer}>
+              <Text style={styles.timeText}>
                 {format(vidProgress.currentTime)}
               </Text>
-
               <Slider
-                style={{width: '80%', height: 40}}
+                style={styles.slider}
                 minimumValue={0}
                 maximumValue={vidProgress.seekableDuration || 0}
                 minimumTrackTintColor="#FFFFFF"
                 maximumTrackTintColor="#fff"
                 value={vidProgress.currentTime}
-                onValueChange={x => {
-                  ref.current.seek(x);
-                }}
+                onValueChange={x => seekVideo(x)}
               />
-              <Text style={{color: 'white'}}>
+              <Text style={styles.timeDurationText}>
                 {format(vidProgress.seekableDuration || 0)}
               </Text>
-            </View>
-
-            <View
-              style={{
-                width: '100%',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                position: 'absolute',
-                top: 8,
-                paddingRight: 20,
-                paddingLeft: 10,
-                alignItems: 'center',
-              }}>
-              <TouchableOpacity
-                onPress={() => {
-                  if (vidFullScreen) {
-                    Orientation.lockToPortrait();
-                  } else {
-                    Orientation.lockToLandscape();
-                  }
-                  setVidFullScreen(!vidFullScreen);
-                }}>
-                <Icon
-                  name={vidFullScreen ? 'fullscreen-exit' : 'fullscreen'}
-                  size={30}
-                  color="white"
-                />
-              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         )}
       </TouchableOpacity>
+
+      {/* Modal for fullscreen video */}
+      <Modal visible={vidFullScreen} transparent={true} animationType="slide">
+        <View style={styles.fullscreenContainer}>
+          <TouchableOpacity
+            style={styles.touchableVideo}
+            onPress={toggleControls}>
+            <Video
+              paused={vidPaused}
+              source={{uri: mediaUrl}}
+              ref={ref}
+              onProgress={x => setVidProgress(x)}
+              style={styles.video}
+              resizeMode="contain"
+              onLoad={onVideoLoad}
+              onEnd={() => {
+                setVidPaused(true);
+                seekVideo(0);
+              }}
+            />
+            {showControls && (
+              <View style={styles.controlsOverlay}>
+                <View style={styles.controlsRow}>
+                  <TouchableOpacity
+                    style={styles.controlButton}
+                    onPress={() =>
+                      seekVideo(parseInt(vidProgress.currentTime) - 10)
+                    }>
+                    <Icon name="rewind-outline" size={30} color="white" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.controlButton}
+                    onPress={() => setVidPaused(!vidPaused)}>
+                    <Icon
+                      name={vidPaused ? 'play-circle' : 'pause-circle'}
+                      size={35}
+                      color="white"
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() =>
+                      seekVideo(parseInt(vidProgress.currentTime) + 10)
+                    }>
+                    <Icon name="fast-forward-outline" size={30} color="white" />
+                  </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity
+                  onPress={toggleFullScreen}
+                  style={styles.fullScreenButton}>
+                  <Icon name="fullscreen-exit" size={30} color="white" />
+                </TouchableOpacity>
+
+                <View style={styles.sliderContainer}>
+                  <Text style={styles.timeText}>
+                    {format(vidProgress.currentTime)}
+                  </Text>
+                  <Slider
+                    style={styles.slider}
+                    minimumValue={0}
+                    maximumValue={vidProgress.seekableDuration || 0}
+                    minimumTrackTintColor="#FFFFFF"
+                    maximumTrackTintColor="#fff"
+                    value={vidProgress.currentTime}
+                    onValueChange={x => seekVideo(x)}
+                  />
+                  <Text style={styles.timeDurationText}>
+                    {format(vidProgress.seekableDuration || 0)}
+                  </Text>
+                </View>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };
 
+const styles = StyleSheet.create({
+  videoContainer: {
+    width: '100%',
+  },
+  touchableVideo: {
+    width: '100%',
+  },
+  video: {
+    width: '100%',
+    height: '100%',
+  },
+  controlsOverlay: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    backgroundColor: 'rgba(0,0,0,.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  controlsRow: {
+    flexDirection: 'row',
+  },
+  controlButton: {
+    marginRight: 50,
+  },
+  fullScreenButton: {
+    position: 'absolute',
+    zIndex: 100,
+    top: 10,
+    right: 10,
+  },
+  sliderContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
+    right: 10,
+  },
+  timeText: {
+    color: 'white',
+  },
+  timeDurationText: {
+    color: 'white',
+    right: 18,
+  },
+  slider: {
+    width: '70%',
+    height: 40,
+    right: 10,
+  },
+  fullscreenContainer: {
+    flex: 1,
+    backgroundColor: 'black',
+  },
+});
 export default VideoControls;

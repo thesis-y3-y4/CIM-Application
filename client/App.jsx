@@ -127,7 +127,7 @@ const toastConfig = {
       text2Style={{
         fontSize: 14,
       }}
-      text1="Oops!"
+      text1="Selection Canceled"
       text2="Unable to update profile picture"
     />
   ),

@@ -1,8 +1,5 @@
 import axios from 'axios';
-const API_BASE_URL =
-  process.env.NODE_ENV === 'production'
-    ? process.env.REACT_APP_API_BASE_URL_PRODUCTION
-    : process.env.REACT_APP_API_BASE_URL_DEVELOPMENT;
+import {API_BASE_URL} from '@env';
 
 export async function fetchUser(endpoint, userData) {
   try {
