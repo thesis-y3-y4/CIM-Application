@@ -131,6 +131,28 @@ const toastConfig = {
       text2="Unable to update profile picture"
     />
   ),
+  gameWon: props => (
+    <BaseToast
+      {...props}
+      onPress={() => Toast.hide()}
+      style={{
+        borderLeftColor: 'green',
+        borderLeftWidth: 7,
+        width: '90%',
+        height: 70,
+        borderRightColor: 'green',
+        borderRightWidth: 7,
+      }}
+      contentContainerStyle={{paddingHorizontal: 15}}
+      text1Style={{
+        fontSize: 18,
+        fontWeight: '500',
+      }}
+      text2Style={{
+        fontSize: 15,
+      }}
+    />
+  ),
 };
 
 // Initialize Firebase

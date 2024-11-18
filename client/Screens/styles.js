@@ -314,6 +314,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
   },
   overlay: {
     position: 'absolute',
@@ -321,12 +322,11 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Darkens the screen
   },
   startButton: {
     paddingVertical: 10,
     paddingHorizontal: 30,
-    backgroundColor: '#FFF', // Button highlighted
+    backgroundColor: '#FFF',
     borderRadius: 10,
     zIndex: 2,
   },
@@ -371,10 +371,10 @@ const styles = StyleSheet.create({
   imageBackground: {
     flex: 1,
     minWidth: '100%',
-    justifyContent: 'flex-end', 
-    alignItems: 'center', 
+    justifyContent: 'flex-end',
+    alignItems: 'center',
     borderRadius: 75,
-    overflow: 'hidden', 
+    overflow: 'hidden',
   },
   comName: {
     fontSize: 14,
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     marginTop: -2,
     lineHeight: 14.2,
     textTransform: 'uppercase',
-    letterSpacing: -.5,
+    letterSpacing: -0.5,
   },
   communitySearchBar: {
     height: 55,

@@ -184,8 +184,8 @@ function FlappyCimScreen(props) {
           Toast.show({
             type: 'success',
             position: 'top',
-            text1: 'Good Job Wildcat!',
-            text2: 'You won +' + points + ' points!',
+            text1: 'You won +' + points + ' claw Marks!',
+            text2: 'Good Job Wildcat!',
             visibilityTime: 3000,
           });
 

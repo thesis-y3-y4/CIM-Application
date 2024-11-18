@@ -131,7 +131,7 @@ function CimdleScreen(props) {
         Toast.show({
           type: 'success',
           position: 'top',
-          text1: 'SPLENDID! You won ' + calculatePoints(curRow) + ' clawMarks!',
+          text1: 'You won ' + calculatePoints(curRow) + ' claw Marks!',
           text2: 'You guessed the word in ' + curRow + ' tries.',
           visibilityTime: 3000,
         });
@@ -143,7 +143,7 @@ function CimdleScreen(props) {
       }, 1000);
       setGameState('won');
     } else if (gameLost() && !gameSubmitted) {
-      setGameSubmitted(true); 
+      setGameSubmitted(true);
       submitGameResult('lose');
 
       setTimeout(() => {

@@ -9,6 +9,7 @@ import {
   FlatList,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
+import {BlurView} from '@react-native-community/blur';
 import VideoControls from './VideoControls';
 import styles from '../styles';
 import {getToken} from '../api/tokenStorage';
@@ -91,9 +92,10 @@ const AnnouncementCard = ({
         <TouchableOpacity onPress={() => handleMediaClick(item.mediaUrl)}>
           <Image source={{uri: item.mediaUrl}} style={mediaStyle} />
         </TouchableOpacity>
+
         {showStartButton && (
           <View style={styles.overlayContainer}>
-            <View style={styles.overlay} />
+            <BlurView style={styles.overlay} />
             <TouchableOpacity
               style={styles.startButton}
               onPress={() => handleGameStart()}>
