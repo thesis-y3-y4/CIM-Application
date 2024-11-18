@@ -73,19 +73,15 @@ function FlappyCimScreen(props) {
         return 20;
     }
   }
-
-  async function submitGameResult(result) {
+  async function submitGameResult(resultData) {
     const token = await getToken();
-    const points = calculatePoints(attempts);
+    const {result, points, FlappyCIM} = resultData;
     const stats = {
       result,
       points,
-      FlappyCIM: {
-        tries: attempts,
-      },
+      FlappyCIM,
     };
     console.log('Stats:', stats);
-
     try {
       const response = await fetchData(`/playminigame`, token, 'POST', {
         announcementId,
@@ -93,8 +89,7 @@ function FlappyCimScreen(props) {
         game: 'Flappy CIM',
         result,
         stats,
-        attempts,
-        tries: attempts,
+        attempts: FlappyCIM.tries,
         points,
       });
       if (response.status === 201) {
@@ -102,13 +97,6 @@ function FlappyCimScreen(props) {
       }
     } catch (error) {
       console.error('Error submitting FlappyCIM result:', error);
-      console.log('FlappyCIM announcementId:', announcementId);
-      console.log('FlappyCIM userId:', userData._id);
-      console.log('FlappyCIM result:', result);
-      console.log('FlappyCIM tries:', attempts);
-      console.log('FlappyCIM points:', points);
-      console.log('FlappyCIM stats:', stats);
-      console.log('FlappyCIM response:', response);
     }
   }
 
@@ -129,8 +117,15 @@ function FlappyCimScreen(props) {
           // If attempts are exhausted, show "No attempts left!" instead
           if (attempts === 1) {
             setAttempts(0);
+            console.log('Attempts:', attempts);
             setGameResult('No attempts left!');
-            submitGameResult('lose');
+            submitGameResult({
+              result: 'lose',
+              points: 10,
+              FlappyCIM: {
+                tries: 0,
+              },
+            });
 
             setTimeout(() => {
               navigation.navigate('AnnouncementPost', {
@@ -145,7 +140,7 @@ function FlappyCimScreen(props) {
           break;
 
         case 'game_won':
-          setGameOverHandled(true); // Set flag to prevent further handling
+          setGameOverHandled(true);
           setRunning(false);
           setGameResult('You Win!');
           submitGameResult('win');
