@@ -8,6 +8,7 @@ import {
   BackHandler,
   Alert,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import axios from 'axios';
@@ -35,12 +36,14 @@ function HomeScreen() {
   const [userReactions, setUserReactions] = useState([]);
   const [likeCounts, setLikeCounts] = useState({});
   const [dislikeCounts, setDislikeCounts] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     getData();
   }, []);
 
   const getData = async () => {
+    setIsLoading(true);
     try {
       const token = await getToken();
       const userDataResponse = await fetchData('/userdata', token);
@@ -89,6 +92,8 @@ function HomeScreen() {
         visibilityTime: 10000,
         onPress: () => Toast.hide(),
       });
+    } finally {
+      setIsLoading(false); // Set loading to false once data is fetched
     }
   };
 
@@ -193,7 +198,13 @@ function HomeScreen() {
         <NavigationBar navigation={navigation} />
 
         <View style={styles.container}>
-          {displayedAnnouncements.length === 0 ? (
+          {isLoading ? (
+            <ActivityIndicator
+              size="large"
+              color="darkgreen"
+              style={{marginTop: 100}}
+            />
+          ) : displayedAnnouncements.length === 0 ? (
             <View>
               <Text
                 style={{

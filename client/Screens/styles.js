@@ -313,8 +313,8 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     justifyContent: 'center',
-    alignItems: 'center',
     overflow: 'hidden',
+    alignItems: 'center',
   },
   overlay: {
     position: 'absolute',

@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Image,
   Modal,
-  Pressable,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
@@ -18,27 +17,39 @@ function MinigamesScreen(props) {
   const navigation = useNavigation();
   const [userData, setUserData] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedGame, setSelectedGame] = useState(''); // Track the selected game for modal
 
-  async function getData() {
+  async function getData(gameType) {
     const token = await getToken();
+    console.log('token', token);
     try {
       const response = await fetchData('/userdata', token);
       const userId = response.data.data._id;
+      console.log('userid', userId);
+
+      // Fetch stats based on game type (either CIMDle or FlappyCIM)
+      const statsEndpoint =
+        gameType === 'CIMDle'
+          ? `/cimdle-stats/${userId}`
+          : `/flappycim-stats/${userId}`;
 
       const minigameStatsResponse = await fetchData(
-        `/cimdle-stats/${userId}`,
+        statsEndpoint,
         token,
         'GET',
       );
       setUserData(minigameStatsResponse.data);
+      console.log(minigameStatsResponse.data);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
   }
 
   useEffect(() => {
-    getData();
-  }, []);
+    if (selectedGame) {
+      getData(selectedGame);
+    }
+  }, [selectedGame]);
 
   return (
     <ScrollView
@@ -53,18 +64,35 @@ function MinigamesScreen(props) {
       </View>
 
       <View style={styles.container}>
+        {/* CIMDle Stats Button */}
         <TouchableOpacity
-          onPress={() => setModalVisible(true)}
+          onPress={() => {
+            setSelectedGame('CIMDle');
+            setModalVisible(true);
+          }}
           style={styles.button}>
           <Image
-            source={{
-              uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRMKCslCVgezPzH8FJx8uM8VNsxaQejVQixA&s',
-            }}
+            source={require('../assets/minigames_logo/CIMdle_LOGO.png')}
             style={styles.image}
           />
-          <Text style={styles.buttonText}>View Cimdle Statistics</Text>
+          <Text style={styles.buttonText}>View CIMDle Statistics</Text>
         </TouchableOpacity>
 
+        {/* Flappy CIM Stats Button */}
+        <TouchableOpacity
+          onPress={() => {
+            setSelectedGame('FlappyCIM');
+            setModalVisible(true);
+          }}
+          style={styles.button}>
+          <Image
+            source={require('../assets/minigames_logo/FLAPPY-CAT-LOGO.png')}
+            style={styles.image}
+          />
+          <Text style={styles.buttonText}>View Flappy CIM Statistics</Text>
+        </TouchableOpacity>
+
+        {/* CIMDle or FlappyCIM Stats Modal */}
         <Modal
           animationType="slide"
           transparent={true}
@@ -72,7 +100,8 @@ function MinigamesScreen(props) {
           onRequestClose={() => setModalVisible(false)}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalView}>
-              <Text style={styles.title}>Cimdle Statistics</Text>
+              <Text style={styles.title}>Statistics</Text>
+              {/* Render stats dynamically based on selected game */}
               <Text style={styles.statText}>
                 Games Played: {userData.gamesPlayed || 0}
               </Text>
@@ -81,14 +110,21 @@ function MinigamesScreen(props) {
               <Text style={styles.statText}>
                 Win Percentage: {userData.winPercentage || 0}%
               </Text>
-              <Text style={styles.statText}>
-                Average Guesses: {userData.averageGuesses || 0}
-              </Text>
-              <Pressable
+              {selectedGame === 'CIMDle' ? (
+                <Text style={styles.statText}>
+                  Average Guesses: {userData.averageGuesses || 0}
+                </Text>
+              ) : (
+                <Text style={styles.statText}>
+                  Average Tries: {userData.averageTries || 0}
+                </Text>
+              )}
+              {/* Close Button */}
+              <TouchableOpacity
                 style={[styles.button, styles.closeButton]}
                 onPress={() => setModalVisible(false)}>
                 <Text style={styles.textStyle}>Close</Text>
-              </Pressable>
+              </TouchableOpacity>
             </View>
           </View>
         </Modal>
@@ -175,7 +211,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   closeButton: {
-    backgroundColor: '#FF5722',
+    backgroundColor: '#4CAF50',
     marginTop: 20,
   },
   textStyle: {

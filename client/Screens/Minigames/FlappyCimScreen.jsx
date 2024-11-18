@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useFocusEffect} from 'react';
 import {GameEngine} from 'react-native-game-engine';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import entities from './src/flappy_components/entities';

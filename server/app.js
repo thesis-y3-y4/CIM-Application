@@ -708,6 +708,52 @@ app.get("/cimdle-stats/:userId", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch minigame stats" });
   }
 });
+app.get("/flappycim-stats/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const games = await minigameModel.find({ userId, game: "Flappy CIM" });
+
+    const gamesPlayed = games.length;
+    const wins = games.filter((game) => game.stats.result === "win").length;
+    const lose = games.filter((game) => game.stats.result === "lose").length;
+
+    const winPercentage = gamesPlayed
+      ? Math.round((wins / gamesPlayed) * 100)
+      : 0;
+
+    // Get the number of tries for each "Flappy CIM" game
+    const triesForFlappyCIM = games
+      .filter(
+        (game) => game.game === "Flappy CIM" && game.stats.FlappyCIM.tries
+      )
+      .map((game) => game.stats.FlappyCIM.tries);
+
+    // Calculate the average tries
+    const averageTries = triesForFlappyCIM.length
+      ? (
+          triesForFlappyCIM.reduce((a, b) => a + b, 0) /
+          triesForFlappyCIM.length
+        ).toFixed(2)
+      : "0.00";
+
+    // Respond with the calculated statistics
+    res.json({
+      gamesPlayed,
+      wins,
+      lose,
+      winPercentage,
+      averageTries,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        error: "Failed to fetch Flappy CIM stats",
+        message: error.message,
+      });
+  }
+});
 
 // MinigameScreen: Check if a user has played a game
 app.get(
