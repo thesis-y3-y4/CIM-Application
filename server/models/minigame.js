@@ -35,10 +35,10 @@ const minigameSchema = new mongoose.Schema({
       default: 0,
     },
     CIMWordle: {
-      guesses: { type: Number, default: null },
+      guesses: { type: Number, default: 0 },
     },
     FlappyCIM: {
-      tries: { type: Number, default: null },
+      tries: { type: Number, default: 0 },
     },
   },
 });

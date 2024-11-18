@@ -57,6 +57,9 @@ function FlappyCimScreen(props) {
   }, [attempts]);
 
   function calculatePoints(attempts) {
+    if (attempts === 0) {
+      return 10;
+    }
     switch (attempts) {
       case 5:
         return 100;
@@ -68,8 +71,6 @@ function FlappyCimScreen(props) {
         return 40;
       case 1:
         return 20;
-      default:
-        return 0;
     }
   }
 
