@@ -23,6 +23,7 @@ function CimdleScreen(props) {
   const [userData, setUserData] = useState('');
   const [minigameWord, setMinigameWord] = useState('');
   const navigation = useNavigation();
+  const [gameSubmitted, setGameSubmitted] = useState(false);
 
   async function getData() {
     const token = await getToken();
@@ -122,35 +123,41 @@ function CimdleScreen(props) {
   }, [curRow]);
 
   const checkGameState = () => {
-    if (gameWon()) {
+    if (gameWon() && !gameSubmitted) {
+      setGameSubmitted(true);
       submitGameResult('win', curRow);
 
       setTimeout(() => {
         Toast.show({
-          type: 'gameWon',
+          type: 'success',
+          position: 'top',
+          text1: 'SPLENDID! You won ' + calculatePoints(curRow) + ' clawMarks!',
+          text2: 'You guessed the word in ' + curRow + ' tries.',
           visibilityTime: 3000,
         });
         setTimeout(() => {
           navigation.navigate('AnnouncementPost', {
             announcementId: announcementId,
           });
-          console.log('CIMDLE announcementId:', announcementId);
         }, 3000);
       }, 1000);
       setGameState('won');
-    } else if (gameLost()) {
+    } else if (gameLost() && !gameSubmitted) {
+      setGameSubmitted(true); 
       submitGameResult('lose');
 
       setTimeout(() => {
         Toast.show({
-          type: 'gameLost',
+          type: 'error',
+          position: 'top',
+          text1: 'Better luck next time!',
+          text2: 'You lost the game.',
           visibilityTime: 3000,
         });
         setTimeout(() => {
           navigation.navigate('AnnouncementPost', {
             announcementId: announcementId,
           });
-          console.log('CIMDLE announcementId:', announcementId);
         }, 3000);
       }, 1000);
       setGameState('lost');

@@ -38,55 +38,6 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icons from 'react-native-vector-icons/FontAwesome5';
 
 const toastConfig = {
-  gameWon: props => (
-    <BaseToast
-      {...props}
-      style={{
-        backgroundColor: 'darkgreen',
-        width: '80%',
-        height: 150,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-      text1Style={{
-        fontSize: 20,
-        fontWeight: '700',
-        color: 'lightgrey',
-        marginBottom: '30',
-      }}
-      text2Style={{
-        fontSize: 14,
-        color: 'white',
-      }}
-      text1="SPLENDID!"
-      text2="You have guessed the word correctly!"
-    />
-  ),
-  gameLost: props => (
-    <BaseToast
-      {...props}
-      style={{
-        backgroundColor: 'darkgreen',
-        width: '80%',
-        height: 150,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-      text1Style={{
-        fontSize: 20,
-        fontWeight: '700',
-        color: 'lightgrey',
-        marginBottom: '30',
-      }}
-      text2Style={{
-        fontSize: 14,
-        color: 'white',
-      }}
-      text1="No more attempts left."
-      // text2="The correct word is: ${word}" //hi hello, hindi ko sure how this should work, em sorry t_t
-    />
-  ),
-
   success: props => (
     <BaseToast
       {...props}

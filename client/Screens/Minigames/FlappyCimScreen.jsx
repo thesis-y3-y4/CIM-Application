@@ -12,6 +12,7 @@ import entities from './src/flappy_components/entities';
 import Physics from './src/flappy_components/physics';
 import {getToken} from '../api/tokenStorage.js';
 import {fetchData} from '../api/api.js';
+import Toast from 'react-native-toast-message';
 
 function FlappyCimScreen(props) {
   const route = useRoute();
@@ -42,9 +43,7 @@ function FlappyCimScreen(props) {
         Alert.alert('Error', 'Minigame data not found');
         return;
       }
-
       setUserData(response.data.data);
-      //console.log('Response data:', response.data);
     } catch (error) {
       console.error('Error fetching FlappyCIM data:', error);
     }
@@ -100,7 +99,7 @@ function FlappyCimScreen(props) {
         game: 'Flappy CIM',
         result,
         stats,
-        attempts: stats.FlappyCIM.tries, // Access FlappyCIM.tries safely
+        attempts: stats.FlappyCIM.tries,
         points,
       });
       if (response.status === 201) {
@@ -138,6 +137,14 @@ function FlappyCimScreen(props) {
               attempts: 0,
               gameResult: 'No attempts left!',
             }));
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              text1: 'Game Over',
+              text2: 'You lost the game.',
+              visibilityTime: 3000,
+            });
+
             submitGameResult({
               result: 'lose',
               points: 10,
@@ -145,7 +152,6 @@ function FlappyCimScreen(props) {
                 tries: 0,
               },
             });
-
             setTimeout(() => {
               navigation.navigate('AnnouncementPost', {
                 announcementId: announcementId,
@@ -173,6 +179,14 @@ function FlappyCimScreen(props) {
             FlappyCIM: {
               tries: gameState.attempts,
             },
+          });
+          const points = calculatePoints(gameState.attempts);
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            text1: 'Good Job Wildcat!',
+            text2: 'You won +' + points + ' points!',
+            visibilityTime: 3000,
           });
 
           setTimeout(() => {
