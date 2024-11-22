@@ -1254,36 +1254,40 @@ app.post(
 );
 
 //only get announcements from organization that the user is a member of
-app.get("/organizationannouncements", authenticateToken, async (req, res) => {
-  try {
-    const userId = req.user._id; // Assuming user id is available in the request (e.g., from authentication middleware)
-    console.log("User ID:", userId);
-    // Find the user by their ID
-    const user = await userModel.findById(userId);
+app.get(
+  "/organizationannouncements:user_id",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { user_id } = req.params; // Assuming user id is available in the request (e.g., from authentication middleware)
+      console.log("User ID:", userId);
+      // Find the user by their ID
+      const user = await userModel.findById(userId);
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (!user.organization) {
+        return res
+          .status(400)
+          .json({ message: "User is not part of any organization" });
+      }
+
+      // Find announcements for the organization the user is part of
+      const announcements = await announcementModel
+        .find({
+          organizationId: user.organization,
+        })
+        .populate("communityId", "name")
+        .populate("organizationId", "name") // Optionally populate organization name
+        .sort({ postingDate: -1 }); // Sort by posting date, descending
+
+      // Respond with the announcements
+      res.status(200).json({ announcements });
+    } catch (error) {
+      console.error("Error fetching announcements:", error);
+      res.status(500).json({ message: "Server error" });
     }
-
-    if (!user.organization) {
-      return res
-        .status(400)
-        .json({ message: "User is not part of any organization" });
-    }
-
-    // Find announcements for the organization the user is part of
-    const announcements = await announcementModel
-      .find({
-        organizationId: user.organization,
-      })
-      .populate("communityId", "name")
-      .populate("organizationId", "name") // Optionally populate organization name
-      .sort({ postingDate: -1 }); // Sort by posting date, descending
-
-    // Respond with the announcements
-    res.status(200).json({ announcements });
-  } catch (error) {
-    console.error("Error fetching announcements:", error);
-    res.status(500).json({ message: "Server error" });
   }
-});
+);
