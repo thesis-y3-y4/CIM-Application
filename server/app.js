@@ -1256,20 +1256,34 @@ app.post(
 //only get announcements from organization that the user is a member of
 app.get("/organizationannouncements", authenticateToken, async (req, res) => {
   try {
-    const user = await userModel.findById(req.user.id);
-    const organizations = await organizationModel.find({ members: user._id });
-    const organizationIds = organizations.map((org) => org._id);
+    const userId = req.user._id; // Assuming user id is available in the request (e.g., from authentication middleware)
+    console.log("User ID:", userId);
+    // Find the user by their ID
+    const user = await userModel.findById(userId);
 
-    const announcements = await announcementModel.find({
-      organizationId: { $in: organizationIds },
-      status: "approved",
-    });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    res.status(200).send({
-      announcements,
-    });
+    if (!user.organization) {
+      return res
+        .status(400)
+        .json({ message: "User is not part of any organization" });
+    }
+
+    // Find announcements for the organization the user is part of
+    const announcements = await announcementModel
+      .find({
+        organizationId: user.organization,
+      })
+      .populate("communityId", "name")
+      .populate("organizationId", "name") // Optionally populate organization name
+      .sort({ postingDate: -1 }); // Sort by posting date, descending
+
+    // Respond with the announcements
+    res.status(200).json({ announcements });
   } catch (error) {
     console.error("Error fetching announcements:", error);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).json({ message: "Server error" });
   }
 });
