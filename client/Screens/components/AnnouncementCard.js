@@ -155,9 +155,8 @@ const AnnouncementCard = ({
           setIsPlaying(false);
           console.log('Audio playback finished');
         });
-        setAudio(sound); // Store the Sound instance
+        setAudio(sound);
         setIsPlaying(true);
-        console.log('Audio is playing');
       });
     } else {
       console.log('Releasing audio instance');

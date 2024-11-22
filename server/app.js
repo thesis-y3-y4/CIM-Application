@@ -1252,3 +1252,24 @@ app.post(
     }
   }
 );
+
+//only get announcements from organization that the user is a member of
+app.get("/organizationannouncements", authenticateToken, async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user.id);
+    const organizations = await organizationModel.find({ members: user._id });
+    const organizationIds = organizations.map((org) => org._id);
+
+    const announcements = await announcementModel.find({
+      organizationId: { $in: organizationIds },
+      status: "approved",
+    });
+
+    res.status(200).send({
+      announcements,
+    });
+  } catch (error) {
+    console.error("Error fetching announcements:", error);
+    res.status(500).send({ error: "Internal server error" });
+  }
+});
