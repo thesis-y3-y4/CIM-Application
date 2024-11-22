@@ -110,22 +110,10 @@ app.post("/login-user", async (req, res) => {
         .send({ status: "error", message: "Invalid password" });
     }
 
-    // Invalidate any previous token (if any) by deleting the user's old token in the database
-    await mobileUserModel.updateOne(
-      { studentemail },
-      { $set: { token: null } }
-    );
-
-    // Generate a new token
     const token = jwt.sign(
       { id: user._id, studentemail: user.studentemail },
       JWT_SECRET
     );
-
-    // Store the new token in the database
-    await mobileUserModel.updateOne({ studentemail }, { $set: { token } });
-
-    // Respond with the new token
     return res.status(200).send({
       status: "ok",
       data: `Bearer ${token}`,
@@ -138,7 +126,6 @@ app.post("/login-user", async (req, res) => {
       .send({ status: "error", message: "Internal server error" });
   }
 });
-
 
 app.post("/userdata", authenticateToken, async (req, res) => {
   try {

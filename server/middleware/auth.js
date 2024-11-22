@@ -12,7 +12,7 @@ const authenticateToken = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    console.log('AUTH Decoded: ', decoded);
+    console.log("AUTH Decoded: ", decoded);
     const user = await userModel.findById(decoded.id);
 
     // Check if the token is the same as the current session token
