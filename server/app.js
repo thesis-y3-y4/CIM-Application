@@ -1253,45 +1253,38 @@ app.post(
   }
 );
 
-//only get announcements from organization that the user is a member of
-app.get(
-  "/organizationannouncements/:user_id",
-  authenticateToken,
-  async (req, res) => {
-    try {
-      const { user_id } = req.params;
-      console.log("User ID:", user_id);
+app.get("/organizationannouncements/:user_id", async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const user = await userModel.findById(userId);
 
-      // Find the user by their ID
-      const user = await userModel.findById(user_id);
-
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      if (!user.organization) {
-        return res
-          .status(400)
-          .json({ message: "User is not part of any organization" });
-      }
-
-      // Check if user.organization is a valid ObjectId, and cast it if necessary
-      const organizationId = mongoose.Types.ObjectId.isValid(user.organization)
-        ? mongoose.Types.ObjectId(user.organization)
-        : user.organization;
-
-      // Find announcements for the organization the user is part of
-      const announcements = await announcementModel
-        .find({ organizationId })
-        .populate("communityId", "name")
-        .populate("organizationId", "name")
-        .sort({ postingDate: -1 });
-
-      // Respond with the announcements
-      res.status(200).json({ announcements });
-    } catch (error) {
-      console.error("Error fetching announcements:", error);
-      res.status(500).json({ message: "Server error" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
+
+    const organizationName = user.organization;
+    const organization = await mongoose
+      .model("Organization")
+      .findOne({ name: organizationName });
+
+    if (!organization) {
+      return res.status(404).json({ message: "Organization not found" });
+    }
+
+    const announcements = await announcementModel.find({
+      organizationId: organization._id,
+    });
+
+    if (announcements.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No announcements found for this organization" });
+    }
+
+    // Send the found announcements
+    res.status(200).json(announcements);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
-);
+});
