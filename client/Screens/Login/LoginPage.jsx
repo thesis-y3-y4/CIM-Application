@@ -40,45 +40,18 @@ function LoginPage({props}) {
     try {
       const response = await fetchUser('/login-user', userData);
       console.log(response.data);
-      if (response.data.status == 'ok') {
-        setTimeout(() => {
-          Toast.show({
-            type: 'success',
-            text1: 'Welcome to CIM App',
-            text2: 'You have successfully logged in',
-            visibilityTime: 3000,
-            onPress: () => Toast.hide(),
-          });
-        }, 1000);
-
+      if (response.data.status === 'ok') {
         const token = response.data.data;
-        // Replace the old token with the new one
-        await storeToken(token); // Store the new token
+        await storeToken(token); // Store token
 
-        // Ensure no other device is logged in
+        // After storing the token, proceed as usual
         await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
-        if (response.data.adminType) {
-          await AsyncStorage.setItem('userType', response.data.adminType);
-        } else {
-          console.log('adminType is null or undefined');
-        }
-
-        const retrievedToken = await AsyncStorage.getItem('userToken');
-
+        const retrievedToken = await getToken();
         navigation.navigate('DrawerHome');
       } else {
         emailInputRef.current.clear();
         passwordInputRef.current.clear();
-
-        setTimeout(() => {
-          Toast.show({
-            type: 'error',
-            text1: 'Invalid Credentials',
-            text2: 'Please try again',
-            visibilityTime: 3000,
-            onPress: () => Toast.hide(),
-          });
-        }, 800);
+        Toast.show({type: 'error', text1: 'Invalid Credentials'});
       }
       console.log('Sending login data:', userData);
     } catch (error) {
@@ -101,6 +74,14 @@ function LoginPage({props}) {
       emailInputRef.current.focus();
     }
   };
+
+  async function storeToken(token) {
+    await AsyncStorage.setItem('userToken', token);
+  }
+
+  async function getToken() {
+    return await AsyncStorage.getItem('userToken');
+  }
 
   async function getData() {
     const data = await AsyncStorage.getItem('isLoggedIn');

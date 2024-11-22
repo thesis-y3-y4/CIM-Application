@@ -89,8 +89,8 @@ app.post("/login-user", async (req, res) => {
   const { studentemail, password } = req.body;
 
   try {
-    let userType = "userType";
     let user = await mobileUserModel.findOne({ studentemail });
+    let userType = "userType";
 
     if (!user) {
       user = await userModel.findOne({ studentemail });
@@ -98,51 +98,44 @@ app.post("/login-user", async (req, res) => {
     }
 
     if (!user) {
-      console.error("User not found:", studentemail);
       return res
         .status(401)
-        .send({ status: "error", message: "User not found" });
+        .send({ status: "Error", message: "User not found" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      console.error("Password mismatch for user:", studentemail);
       return res
         .status(401)
         .send({ status: "error", message: "Invalid password" });
     }
 
+    // Invalidate any previous token (if any) by deleting the user's old token in the database
+    await mobileUserModel.updateOne(
+      { studentemail },
+      { $set: { token: null } }
+    );
+
     // Generate a new token
     const token = jwt.sign(
       { id: user._id, studentemail: user.studentemail },
-      process.env.JWT_SECRET
-    );
-    if (!token) {
-      console.error("JWT generation failed.");
-      return res
-        .status(500)
-        .send({ status: "error", message: "Internal server error" });
-    }
-
-    // Store the token in a session store (e.g., MongoDB or Redis)
-    await SessionModel.findOneAndUpdate(
-      { userId: user._id },
-      { token: token },
-      { upsert: true }
+      JWT_SECRET
     );
 
+    // Store the new token in the database
+    await mobileUserModel.updateOne({ studentemail }, { $set: { token } });
+
+    // Respond with the new token
     return res.status(200).send({
       status: "ok",
       data: `Bearer ${token}`,
       [userType]: user[userType],
     });
   } catch (error) {
-    console.error("Error during login:", error); // Log the full error
-    return res.status(500).send({
-      status: "error",
-      message: "Internal server error",
-      error: error.message,
-    });
+    console.error(error);
+    return res
+      .status(500)
+      .send({ status: "error", message: "Internal server error" });
   }
 });
 
