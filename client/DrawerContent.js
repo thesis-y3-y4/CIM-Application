@@ -14,8 +14,8 @@ import {fetchData} from './Screens/api/api';
 import {getToken} from './Screens/api/tokenStorage';
 
 const DrawerList = [
-  {icons: 'home-outline', label: 'Home', navigateTo: 'MainHome'},
   {icons: 'account-group', label: 'Communities', navigateTo: 'Communities'},
+  {icons: 'city-variant', label: 'Organization', navigateTo: 'Organization'},
   {icons: 'gamepad', label: 'Minigames', navigateTo: 'Minigames'},
   {icons: 'shopping', label: 'Shop', navigateTo: 'Shop'},
   {icons: 'account-supervisor', label: 'Friends', navigateTo: 'Friends'},
@@ -85,20 +85,40 @@ function DrawerContent({refreshData}) {
 
   async function signOut() {
     try {
-      //close DrawerContent
-      navigation.dispatch(DrawerActions.closeDrawer());
+      const token = await getToken();
+      if (!token) {
+        console.log('No token found');
+        return;
+      }
 
-      await AsyncStorage.removeItem('isLoggedIn');
-      await AsyncStorage.removeItem('token');
+      const {studentemail} = userData;
+      if (!studentemail) {
+        console.log('No studentemail found in user data');
+        return;
+      }
 
-      setUserData({});
-
-      navigation.reset({
-        index: 0,
-        routes: [{name: 'LoginUser'}],
+      const response = await fetchData('/logout-user', token, 'POST', {
+        studentemail,
       });
+      console.log('DC: Response during sign out:', response.status);
+      if (response.status === 200) {
+        console.log('Logged out successfully');
+        navigation.dispatch(DrawerActions.closeDrawer());
+        await AsyncStorage.removeItem('isLoggedIn');
+        await AsyncStorage.removeItem('token');
+        setUserData({});
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'LoginUser'}],
+        });
+      } else {
+        console.log(
+          'Error during logout:',
+          response.message || 'No response message',
+        );
+      }
     } catch (error) {
-      console.error('Error during sign out:', error);
+      console.error('DC: Error during sign out:', error);
     }
   }
 

@@ -16,6 +16,7 @@ import {getToken} from '../api/tokenStorage';
 import {fetchData} from '../api/api';
 import {useNavigation} from '@react-navigation/native';
 import TimeDisplay from './TimeDisplay';
+import Sound from 'react-native-sound';
 
 const AnnouncementCard = ({
   item,
@@ -35,6 +36,8 @@ const AnnouncementCard = ({
   const [comments, setComments] = useState([]);
   const [hasPlayedGame, setHasPlayedGame] = useState(false);
   const [refreshCheck, setRefreshCheck] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audio, setAudio] = useState(null);
 
   useEffect(() => {
     checkIfUserPlayed();
@@ -53,6 +56,13 @@ const AnnouncementCard = ({
       });
     }
   }, [item._id, refreshCheck]);
+  useEffect(() => {
+    return () => {
+      if (audio) {
+        audio.release();
+      }
+    };
+  }, [audio]);
 
   const checkIfUserPlayed = async () => {
     const token = await getToken();
@@ -105,12 +115,57 @@ const AnnouncementCard = ({
         )}
       </View>
     );
-  } else if (
-    item.mediaUrl &&
-    ['video/mp4', 'audio/mpeg'].includes(item.contentType)
-  ) {
+  } else if (item.mediaUrl && ['video/mp4'].includes(item.contentType)) {
     mediaElement = <VideoControls mediaUrl={item.mediaUrl} />;
+  } else if (item.mediaUrl && ['audio/mpeg'].includes(item.contentType)) {
+    mediaElement = (
+      <View style={styles.audioContainer}>
+        <TouchableOpacity
+          style={styles.audioButton}
+          onPress={() => {
+            toggleAudio();
+          }}>
+          <Icon
+            name={isPlaying ? 'play' : 'playcircleo'}
+            size={36}
+            color="green"
+          />
+        </TouchableOpacity>
+
+        <Text style={styles.audioText}>
+          {isPlaying ? 'Playing...' : 'Tap to Play'}
+        </Text>
+      </View>
+    );
   }
+  const toggleAudio = () => {
+    if (!audio) {
+      const sound = new Sound(item.mediaUrl, null, error => {
+        if (error) {
+          console.error('Failed to load the sound:', error);
+          return;
+        }
+        console.log('Audio loaded successfully');
+        sound.play(success => {
+          if (!success) {
+            console.error('Playback failed due to decoding issues');
+          }
+          sound.release(); // Release the sound resource after playback
+          setAudio(null);
+          setIsPlaying(false);
+          console.log('Audio playback finished');
+        });
+        setAudio(sound); // Store the Sound instance
+        setIsPlaying(true);
+        console.log('Audio is playing');
+      });
+    } else {
+      console.log('Releasing audio instance');
+      audio.release();
+      setAudio(null);
+      setIsPlaying(false);
+    }
+  };
 
   const renderDetails = () => {
     const maxLength = 150;

@@ -40,6 +40,7 @@ function FriendsScreen(props) {
         token,
         'GET',
       );
+      console.log(response.data.data._id);
       setFriendList(friendsResponse.data);
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -200,9 +201,9 @@ function FriendsScreen(props) {
               }>
               <Image
                 source={{
-                  uri:
-                    friList.friend.profilePicture ||
-                    'https://cdn.vectorstock.com/i/500p/95/56/user-profile-icon-avatar-or-person-vector-45089556.jpg',
+                  uri: friList.friend?.profilePicture
+                    ? friList.friend.profilePicture
+                    : 'https://cdn.vectorstock.com/i/500p/95/56/user-profile-icon-avatar-or-person-vector-45089556.jpg',
                 }}
                 style={{
                   width: 50,
@@ -213,10 +214,12 @@ function FriendsScreen(props) {
               />
               <View>
                 <Text style={{fontSize: 16, fontWeight: 'bold', color: '#333'}}>
-                  {friList.friend.name || 'Unknown User'}
+                  {friList.friend?.name ? friList.friend.name : 'Wildcat'}
                 </Text>
                 <Text style={{fontSize: 14, color: '#666'}}>
-                  Wildcat #{formatId(friList.friend._id)}
+                  {friList.friend?._id
+                    ? `Wildcat #${formatId(friList.friend._id)}`
+                    : 'ID not available'}
                 </Text>
               </View>
             </TouchableOpacity>

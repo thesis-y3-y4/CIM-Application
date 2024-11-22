@@ -13,7 +13,6 @@ import {
   SocketContextProvider,
   SocketProvider,
 } from './Screens/api/socketContext';
-import {fetchData} from './Screens/api/api.js';
 import {getToken} from './Screens/api/tokenStorage.js';
 import firebase from '@react-native-firebase/app';
 
@@ -34,6 +33,7 @@ import FlappyCimScreen from './Screens/Minigames/FlappyCimScreen';
 import AnnouncementPostScreen from './Screens/AnnouncementPost';
 import ProfileFriendScreen from './Screens/ProfileFriendScreen';
 import ShopScreen from './Screens/ShopScreen';
+import OrganizationScreen from './Screens/OrganizationScreen';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icons from 'react-native-vector-icons/FontAwesome5';
 
@@ -199,6 +199,7 @@ const StackNav = () => {
       />
       <Stack.Screen name="ProfileFriend" component={ProfileFriendScreen} />
       <Stack.Screen name="Shop" component={ShopScreen} />
+      <Stack.Screen name="Organization" component={OrganizationScreen} />
 
       <Stack.Screen
         name="LoginUser"

@@ -331,6 +331,24 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
+  audioContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    backgroundColor: '#f9f9f9',
+  },
+  audioButton: {
+    marginRight: 10,
+  },
+  audioText: {
+    fontSize: 16,
+    color: '#333',
+  },
+
   //Minigames
   overlayContainer: {
     position: 'absolute',

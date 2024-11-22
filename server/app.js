@@ -22,6 +22,7 @@ const minigameModel = require("./models/minigame");
 const friendRequestModel = require("./models/friendRequest");
 const friendsModel = require("./models/friends");
 const minigameShopItemModel = require("./models/minigameshopitems");
+const organizationModel = require("./models/organization");
 
 //Middleware
 const authenticateToken = require("./middleware/auth");
@@ -110,10 +111,29 @@ app.post("/login-user", async (req, res) => {
         .send({ status: "error", message: "Invalid password" });
     }
 
+    // Check if there's already an active session for another device (Device 1)
+    const currentSessionToken = user.currentSessionToken;
+    if (currentSessionToken) {
+      // Invalidate the session for Device 1 (could be done by deleting the token or updating it to null)
+      await mobileUserModel.updateOne(
+        { studentemail },
+        { $set: { currentSessionToken: null } }
+      );
+    }
+
+    // Generate a new token for Device 2
     const token = jwt.sign(
       { id: user._id, studentemail: user.studentemail },
       JWT_SECRET
     );
+
+    // Store the new token in the database
+    await mobileUserModel.updateOne(
+      { studentemail },
+      { $set: { currentSessionToken: token } }
+    );
+
+    // Respond with the new token
     return res.status(200).send({
       status: "ok",
       data: `Bearer ${token}`,
@@ -124,6 +144,49 @@ app.post("/login-user", async (req, res) => {
     return res
       .status(500)
       .send({ status: "error", message: "Internal server error" });
+  }
+});
+
+app.post("/logout-user", authenticateToken, async (req, res) => {
+  const { studentemail } = req.body;
+
+  try {
+    // Try to find the user in mobileUserModel first and nullify the session token
+    const mobileUser = await mobileUserModel.findOne({ studentemail });
+
+    if (mobileUser) {
+      await mobileUserModel.updateOne(
+        { studentemail },
+        { $set: { currentSessionToken: null } }
+      );
+      console.log(`Session token nullified for mobileUser: ${studentemail}`);
+    } else {
+      // If not found in mobileUserModel, search in userModel
+      const user = await userModel.findOne({ studentemail });
+
+      if (user) {
+        await userModel.updateOne(
+          { studentemail },
+          { $set: { currentSessionToken: null } }
+        );
+        console.log(`Session token nullified for userModel: ${studentemail}`);
+      } else {
+        return res.status(404).send({
+          status: "error",
+          message: "User not found in both models.",
+        });
+      }
+    }
+
+    return res
+      .status(200)
+      .send({ status: "ok", message: "Logged out successfully." });
+  } catch (error) {
+    console.error("Error during logout:", error);
+    return res.status(500).send({
+      status: "error",
+      message: "Internal server error",
+    });
   }
 });
 
@@ -397,13 +460,6 @@ app.get("/communityforumposts/:communityId", async (req, res) => {
       .find({ communityId })
       .sort({ datePosted: -1 });
 
-    // console.log(forumPosts);
-
-    console.log(
-      `Fetched FORUM posts: ${JSON.stringify(
-        forumPosts.length
-      )} from - ${communityId}`
-    );
     res.status(200).send({ status: "success fetch forum posts", forumPosts });
   } catch (error) {
     console.error("Error fetching forum posts:", error);
@@ -745,12 +801,10 @@ app.get("/flappycim-stats/:userId", async (req, res) => {
       averageTries,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Failed to fetch Flappy CIM stats",
-        message: error.message,
-      });
+    res.status(500).json({
+      error: "Failed to fetch Flappy CIM stats",
+      message: error.message,
+    });
   }
 });
 
