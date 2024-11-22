@@ -1255,15 +1255,15 @@ app.post(
 
 //only get announcements from organization that the user is a member of
 app.get(
-  "/organizationannouncements/:user_id", // Added the missing colon for route parameter
-  authenticateToken, // Middleware to authenticate the user
+  "/organizationannouncements/:user_id",
+  authenticateToken,
   async (req, res) => {
     try {
-      const { user_id } = req.params; // Destructuring to get user_id from the route parameters
-      console.log("User ID:", user_id); // Logging the user_id for debugging
+      const { user_id } = req.params;
+      console.log("User ID:", user_id);
 
       // Find the user by their ID
-      const user = await userModel.findById(user_id); // Use user_id instead of userId
+      const user = await userModel.findById(user_id);
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });
