@@ -745,10 +745,12 @@ app.get("/flappycim-stats/:userId", async (req, res) => {
       averageTries,
     });
   } catch (error) {
-    res.status(500).json({
-      error: "Failed to fetch Flappy CIM stats",
-      message: error.message,
-    });
+    res
+      .status(500)
+      .json({
+        error: "Failed to fetch Flappy CIM stats",
+        message: error.message,
+      });
   }
 });
 
