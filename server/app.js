@@ -35,6 +35,7 @@ mongoose
   .connect(mongoUrl)
   .then(() => {
     console.log("Successfully connected to the database");
+    console.log("JWT_SECRET", JWT_SECRET);
   })
   .catch((err) => {
     console.log("Database connection failed: \n", err);
@@ -121,6 +122,7 @@ app.post("/login-user", async (req, res) => {
       { id: user._id, studentemail: user.studentemail },
       JWT_SECRET
     );
+    console.log("Generated token:", token);
 
     // Store the new token in the database
     await mobileUserModel.updateOne({ studentemail }, { $set: { token } });
