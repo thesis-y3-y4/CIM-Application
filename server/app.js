@@ -35,7 +35,6 @@ mongoose
   .connect(mongoUrl)
   .then(() => {
     console.log("Successfully connected to the database");
-    console.log("JWT_SECRET", JWT_SECRET);
   })
   .catch((err) => {
     console.log("Database connection failed: \n", err);
