@@ -1275,9 +1275,14 @@ app.get(
           .json({ message: "User is not part of any organization" });
       }
 
+      // Check if user.organization is a valid ObjectId, and cast it if necessary
+      const organizationId = mongoose.Types.ObjectId.isValid(user.organization)
+        ? mongoose.Types.ObjectId(user.organization)
+        : user.organization;
+
       // Find announcements for the organization the user is part of
       const announcements = await announcementModel
-        .find({ organizationId: user.organization })
+        .find({ organizationId })
         .populate("communityId", "name")
         .populate("organizationId", "name")
         .sort({ postingDate: -1 });
