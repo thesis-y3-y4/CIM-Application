@@ -36,23 +36,29 @@ const DrawerLayout = ({icon, label, navigateTo}) => {
   );
 };
 
-const DrawerItems = () => {
-  return DrawerList.map((item, i) => {
-    return (
-      <DrawerLayout
-        key={i}
-        icon={item.icons}
-        label={item.label}
-        navigateTo={item.navigateTo}
-      />
-    );
+const DrawerItems = ({isUserModel}) => {
+  const filteredDrawerList = DrawerList.filter(item => {
+    // Exclude "Organization" for MobileUser
+    if (item.label === 'Organization' && !isUserModel) return false;
+    return true;
   });
+
+  return filteredDrawerList.map((item, i) => (
+    <DrawerLayout
+      key={i}
+      icon={item.icons}
+      label={item.label}
+      navigateTo={item.navigateTo}
+    />
+  ));
 };
 
 function DrawerContent({refreshData}) {
   const navigation = useNavigation();
   const [userData, setUserData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+
+  const isUserModel = userData && userData.adminType !== undefined;
 
   const getData = useCallback(async () => {
     const token = await getToken();
@@ -160,7 +166,7 @@ function DrawerContent({refreshData}) {
             </View>
           </TouchableOpacity>
           <View style={styles.drawerSection}>
-            <DrawerItems />
+            <DrawerItems isUserModel={isUserModel} />
           </View>
         </View>
       </DrawerContentScrollView>

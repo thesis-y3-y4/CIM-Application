@@ -46,6 +46,7 @@ function LoginPage({props}) {
         await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
         if (response.data.adminType) {
           await AsyncStorage.setItem('userType', response.data.adminType);
+          navigation.navigate('DrawerHome');
         } else {
           navigation.navigate('DrawerHome');
         }
