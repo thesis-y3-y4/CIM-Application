@@ -73,6 +73,10 @@ const mobileUserSchema = new Schema({
     type: String,
     required: false,
   },
+  currentSessionToken: {
+    type: String,
+    required: false,
+  },
 });
 
 mobileUserSchema.virtual("relevantFields").get(function () {

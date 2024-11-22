@@ -27,7 +27,6 @@ const minigameShopItemModel = require("./models/minigameshopitems");
 const authenticateToken = require("./middleware/auth");
 
 const mongoUrl = process.env.MONGO_URL;
-const JWT_SECRET = process.env.JWT_SECRET;
 
 app.use("/assets", express.static(__dirname + "client/assets"));
 

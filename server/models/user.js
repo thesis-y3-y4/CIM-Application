@@ -72,6 +72,10 @@ const userSchema = new Schema({
     type: String,
     required: false,
   },
+  currentSessionToken: { 
+    type: String,
+    required: false,
+  },
 });
 
 const UserModel = mongoose.model("User", userSchema);
