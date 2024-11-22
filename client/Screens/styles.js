@@ -348,6 +348,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    backgroundColor: 'rgba(144, 238, 144, 0.5)',
   },
   startButton: {
     paddingVertical: 10,
@@ -357,7 +358,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   startButtonText: {
-    color: '#000', // Button text color
+    color: '#000',
     fontSize: 18,
     fontWeight: 'bold',
   },
