@@ -14,9 +14,10 @@ import Orientation from 'react-native-orientation-locker';
 
 const screen = Dimensions.get('screen');
 const screenWidth = Dimensions.get('window').width;
+
 const VideoControls = ({mediaUrl}) => {
+  const ref = useRef();
   const [vidPaused, setVidPaused] = useState(true);
-  const [modalVidPaused, setModalVidPaused] = useState(true);
   const [vidProgress, setVidProgress] = useState({currentTime: 0});
   const [vidFullScreen, setVidFullScreen] = useState(false);
   const [showControls, setShowControls] = useState(false);
@@ -24,8 +25,6 @@ const VideoControls = ({mediaUrl}) => {
   const [videoHeight, setVideoHeight] = useState(
     Dimensions.get('window').width / 2.5,
   );
-  const mainVideoRef = useRef(); // For the main video
-  const modalVideoRef = useRef(); // For the modal video
 
   const format = seconds => {
     let mins = parseInt(seconds / 60)
@@ -64,50 +63,33 @@ const VideoControls = ({mediaUrl}) => {
   };
 
   const toggleFullScreen = () => {
-    const isExiting = vidFullScreen;
     setVidFullScreen(!vidFullScreen);
-
-    if (isExiting) {
-      // Exiting fullscreen
-      setModalVidPaused(true); // Pause the modal video
-      setVidPaused(false); // Resume the main video
-      if (mainVideoRef.current) {
-        mainVideoRef.current.seek(vidProgress.currentTime); // Sync time
+    if (!vidFullScreen) {
+      if (videoAspectRatio > 1) {
+        Orientation.lockToLandscape();
+      } else {
+        Orientation.lockToPortrait();
       }
-      Orientation.unlockAllOrientations();
     } else {
-      // Entering fullscreen
-      setVidPaused(true); // Pause the main video
-      setModalVidPaused(false); // Play the modal video
-      if (modalVideoRef.current) {
-        modalVideoRef.current.seek(vidProgress.currentTime); // Sync time
-      }
-      videoAspectRatio > 1
-        ? Orientation.lockToLandscape()
-        : Orientation.lockToPortrait();
+      Orientation.unlockAllOrientations();
     }
   };
 
   const seekVideo = time => {
-    if (mainVideoRef.current) {
-      mainVideoRef.current.seek(time);
+    if (ref.current) {
+      ref.current.seek(time);
     }
   };
 
   return (
     <View style={[styles.videoContainer, {height: videoHeight}]}>
-      {/* Main Video */}
       <TouchableOpacity style={styles.touchableVideo} onPress={toggleControls}>
         <Video
           paused={vidPaused}
           source={{uri: mediaUrl}}
-          ref={videoRef => {
-            if (videoRef) {
-              mainVideoRef.current = videoRef;
-            }
-          }}
+          ref={ref}
           onProgress={x => setVidProgress(x)}
-          style={[styles.video]}
+          style={styles.video}
           resizeMode="contain"
           onLoad={onVideoLoad}
           onEnd={() => {
@@ -173,30 +155,78 @@ const VideoControls = ({mediaUrl}) => {
           </TouchableOpacity>
         )}
       </TouchableOpacity>
-      {/* Fullscreen Modal */}
+
+      {/* Modal for fullscreen video */}
       <Modal visible={vidFullScreen} transparent={true} animationType="slide">
         <View style={styles.fullscreenContainer}>
           <TouchableOpacity
             style={styles.touchableVideo}
             onPress={toggleControls}>
             <Video
-              paused={modalVidPaused}
+              paused={vidPaused}
               source={{uri: mediaUrl}}
-              ref={modalVideoRef}
+              ref={ref}
               onProgress={x => setVidProgress(x)}
-              style={[styles.video, {aspectRatio: videoAspectRatio}]}
+              style={styles.video}
               resizeMode="contain"
               onLoad={onVideoLoad}
               onEnd={() => {
-                setModalVidPaused(true);
+                setVidPaused(true);
                 seekVideo(0);
               }}
             />
-            <TouchableOpacity
-              onPress={toggleFullScreen}
-              style={styles.fullScreenButton}>
-              <Icon name="fullscreen-exit" size={30} color="white" />
-            </TouchableOpacity>
+            {showControls && (
+              <View style={styles.controlsOverlay}>
+                <View style={styles.controlsRow}>
+                  <TouchableOpacity
+                    style={styles.controlButton}
+                    onPress={() =>
+                      seekVideo(parseInt(vidProgress.currentTime) - 10)
+                    }>
+                    <Icon name="rewind-outline" size={30} color="white" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.controlButton}
+                    onPress={() => setVidPaused(!vidPaused)}>
+                    <Icon
+                      name={vidPaused ? 'play-circle' : 'pause-circle'}
+                      size={35}
+                      color="white"
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() =>
+                      seekVideo(parseInt(vidProgress.currentTime) + 10)
+                    }>
+                    <Icon name="fast-forward-outline" size={30} color="white" />
+                  </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity
+                  onPress={toggleFullScreen}
+                  style={styles.fullScreenButton}>
+                  <Icon name="fullscreen-exit" size={30} color="white" />
+                </TouchableOpacity>
+
+                <View style={styles.sliderContainer}>
+                  <Text style={styles.timeText}>
+                    {format(vidProgress.currentTime)}
+                  </Text>
+                  <Slider
+                    style={styles.slider}
+                    minimumValue={0}
+                    maximumValue={vidProgress.seekableDuration || 0}
+                    minimumTrackTintColor="#FFFFFF"
+                    maximumTrackTintColor="#fff"
+                    value={vidProgress.currentTime}
+                    onValueChange={x => seekVideo(x)}
+                  />
+                  <Text style={styles.timeDurationText}>
+                    {format(vidProgress.seekableDuration || 0)}
+                  </Text>
+                </View>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </Modal>
@@ -258,8 +288,6 @@ const styles = StyleSheet.create({
   },
   fullscreenContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: 'black',
   },
 });
