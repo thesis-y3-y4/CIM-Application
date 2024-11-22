@@ -189,6 +189,17 @@ app.post("/logout-user", authenticateToken, async (req, res) => {
   }
 });
 
+app.post("/validate-token", authenticateToken, (req, res) => {
+  try {
+    // If the token is valid, you can access the user info from req.user (set by authenticateToken middleware)
+    res.status(200).send({ status: "ok" });
+  } catch (error) {
+    res
+      .status(401)
+      .send({ status: "error", message: "Token is invalid or expired." });
+  }
+});
+
 app.post("/userdata", authenticateToken, async (req, res) => {
   try {
     const user = req.user;
