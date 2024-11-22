@@ -89,8 +89,8 @@ app.post("/login-user", async (req, res) => {
   const { studentemail, password } = req.body;
 
   try {
-    let user = await mobileUserModel.findOne({ studentemail });
     let userType = "userType";
+    let user = await mobileUserModel.findOne({ studentemail });
 
     if (!user) {
       user = await userModel.findOne({ studentemail });
@@ -98,13 +98,15 @@ app.post("/login-user", async (req, res) => {
     }
 
     if (!user) {
+      console.error("User not found:", studentemail);
       return res
         .status(401)
-        .send({ status: "Error", message: "User not found" });
+        .send({ status: "error", message: "User not found" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      console.error("Password mismatch for user:", studentemail);
       return res
         .status(401)
         .send({ status: "error", message: "Invalid password" });
@@ -113,14 +115,20 @@ app.post("/login-user", async (req, res) => {
     // Generate a new token
     const token = jwt.sign(
       { id: user._id, studentemail: user.studentemail },
-      JWT_SECRET
+      process.env.JWT_SECRET
     );
+    if (!token) {
+      console.error("JWT generation failed.");
+      return res
+        .status(500)
+        .send({ status: "error", message: "Internal server error" });
+    }
 
     // Store the token in a session store (e.g., MongoDB or Redis)
     await SessionModel.findOneAndUpdate(
       { userId: user._id },
       { token: token },
-      { upsert: true } 
+      { upsert: true }
     );
 
     return res.status(200).send({
@@ -129,13 +137,14 @@ app.post("/login-user", async (req, res) => {
       [userType]: user[userType],
     });
   } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .send({ status: "error", message: "Internal server error" });
+    console.error("Error during login:", error); // Log the full error
+    return res.status(500).send({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 });
-
 
 app.post("/userdata", authenticateToken, async (req, res) => {
   try {

@@ -80,6 +80,7 @@ function LoginPage({props}) {
           });
         }, 800);
       }
+      console.log('Sending login data:', userData);
     } catch (error) {
       console.error('Error during login:', error);
       setTimeout(() => {
