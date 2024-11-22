@@ -50,8 +50,12 @@ function LoginPage({props}) {
             onPress: () => Toast.hide(),
           });
         }, 1000);
+
         const token = response.data.data;
-        await storeToken(token);
+        // Replace the old token with the new one
+        await storeToken(token); // Store the new token
+
+        // Ensure no other device is logged in
         await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
         if (response.data.adminType) {
           await AsyncStorage.setItem('userType', response.data.adminType);

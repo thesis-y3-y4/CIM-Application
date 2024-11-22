@@ -110,10 +110,19 @@ app.post("/login-user", async (req, res) => {
         .send({ status: "error", message: "Invalid password" });
     }
 
+    // Generate a new token
     const token = jwt.sign(
       { id: user._id, studentemail: user.studentemail },
       JWT_SECRET
     );
+
+    // Store the token in a session store (e.g., MongoDB or Redis)
+    await SessionModel.findOneAndUpdate(
+      { userId: user._id },
+      { token: token },
+      { upsert: true } 
+    );
+
     return res.status(200).send({
       status: "ok",
       data: `Bearer ${token}`,
@@ -127,7 +136,7 @@ app.post("/login-user", async (req, res) => {
   }
 });
 
-//
+
 app.post("/userdata", authenticateToken, async (req, res) => {
   try {
     const user = req.user;
@@ -746,12 +755,10 @@ app.get("/flappycim-stats/:userId", async (req, res) => {
       averageTries,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Failed to fetch Flappy CIM stats",
-        message: error.message,
-      });
+    res.status(500).json({
+      error: "Failed to fetch Flappy CIM stats",
+      message: error.message,
+    });
   }
 });
 
