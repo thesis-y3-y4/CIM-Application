@@ -111,10 +111,10 @@ app.post("/login-user", async (req, res) => {
         .send({ status: "error", message: "Invalid password" });
     }
 
-    // Invalidate any previous token (if any) by deleting the user's old token in the database
+    // Invalidate any previous session (if any) by removing the old token
     await mobileUserModel.updateOne(
       { studentemail },
-      { $set: { token: null } }
+      { $set: { currentSessionToken: null } }
     );
 
     // Generate a new token
@@ -123,8 +123,11 @@ app.post("/login-user", async (req, res) => {
       JWT_SECRET
     );
 
-    // Store the new token in the database
-    await mobileUserModel.updateOne({ studentemail }, { $set: { token } });
+    // Store the new token in the database as the current session token
+    await mobileUserModel.updateOne(
+      { studentemail },
+      { $set: { currentSessionToken: token } }
+    );
 
     // Respond with the new token
     return res.status(200).send({
