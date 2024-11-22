@@ -26,6 +26,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 function OrganizationScreen() {
   const navigation = useNavigation();
   const scrollViewRef = useRef();
+  const [userData, setUserData] = useState(null);
   const [announceData, setAnnounceData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [displayedAnnouncements, setDisplayedAnnouncements] = useState([]);
@@ -47,12 +48,20 @@ function OrganizationScreen() {
     try {
       const token = await getToken();
       const userDataResponse = await fetchData('/userdata', token);
-      console.log('userDataResponse', userDataResponse.data.data._id);
+      setUserData(userDataResponse.data.data);
+      console.log('userDataResponse', userDataResponse.data.data);
 
-      const announceDataResponse = await fetchData('/announcedata', token);
-      const sortedAnnouncements = announceDataResponse.data.announcements.sort(
+      const announceDataResponse = await fetchData(
+        `/organizationannouncements/674048d6584af0df4bfcd833`,
+        token,
+        'GET',
+      );
+      console.log('announceDataResponse', announceDataResponse.data);
+
+      const sortedAnnouncements = (announceDataResponse.data || []).sort(
         (post1, post2) => new Date(post2.createdAt) - new Date(post1.createdAt),
       );
+
       setAnnounceData(sortedAnnouncements);
       setDisplayedAnnouncements(sortedAnnouncements.slice(0, 3));
       setRemainingAnnouncements(sortedAnnouncements.slice(3));
@@ -172,7 +181,12 @@ function OrganizationScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
         <NavigationBar navigation={navigation} />
-        <Text style={styles.title}>Organization</Text>
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerText}>
+            Organization Announcements {'\n'}
+            {userData?.organization || 'Loading...'}
+          </Text>
+        </View>
 
         <View style={styles.container}>
           {isLoading ? (

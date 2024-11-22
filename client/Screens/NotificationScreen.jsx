@@ -189,7 +189,7 @@ function NotificationScreen(props) {
                   const dateNotif = new Date(notification.timestamp);
                   return (
                     <TouchableOpacity
-                      key={notification.id}
+                      key={notification._id}
                       style={[
                         styles.notificationContainer,
                         {

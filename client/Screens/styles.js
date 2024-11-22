@@ -173,6 +173,26 @@ const styles = StyleSheet.create({
   cardDetails: {
     flex: 1,
   },
+  headerContainer: {
+    backgroundColor: '#013220',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  headerText: {
+    color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    letterSpacing: 1.2,
+  },
+
   image: {
     width: 50,
     height: 50,

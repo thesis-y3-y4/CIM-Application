@@ -14,6 +14,7 @@ import {fetchData} from './Screens/api/api';
 import {getToken} from './Screens/api/tokenStorage';
 
 const DrawerList = [
+  {icons: 'home', label: 'Home', navigateTo: 'MainHome'},
   {icons: 'account-group', label: 'Communities', navigateTo: 'Communities'},
   {icons: 'city-variant', label: 'Organization', navigateTo: 'Organization'},
   {icons: 'gamepad', label: 'Minigames', navigateTo: 'Minigames'},
