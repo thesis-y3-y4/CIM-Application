@@ -1255,14 +1255,15 @@ app.post(
 
 //only get announcements from organization that the user is a member of
 app.get(
-  "/organizationannouncements:user_id",
-  authenticateToken,
+  "/organizationannouncements/:user_id", // Added the missing colon for route parameter
+  authenticateToken, // Middleware to authenticate the user
   async (req, res) => {
     try {
-      const { user_id } = req.params; // Assuming user id is available in the request (e.g., from authentication middleware)
-      console.log("User ID:", userId);
+      const { user_id } = req.params; // Destructuring to get user_id from the route parameters
+      console.log("User ID:", user_id); // Logging the user_id for debugging
+
       // Find the user by their ID
-      const user = await userModel.findById(userId);
+      const user = await userModel.findById(user_id); // Use user_id instead of userId
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -1276,12 +1277,10 @@ app.get(
 
       // Find announcements for the organization the user is part of
       const announcements = await announcementModel
-        .find({
-          organizationId: user.organization,
-        })
+        .find({ organizationId: user.organization })
         .populate("communityId", "name")
-        .populate("organizationId", "name") // Optionally populate organization name
-        .sort({ postingDate: -1 }); // Sort by posting date, descending
+        .populate("organizationId", "name")
+        .sort({ postingDate: -1 });
 
       // Respond with the announcements
       res.status(200).json({ announcements });

@@ -47,6 +47,7 @@ function OrganizationScreen() {
     try {
       const token = await getToken();
       const userDataResponse = await fetchData('/userdata', token);
+      console.log('userDataResponse', userDataResponse.data.data._id);
 
       const announceDataResponse = await fetchData('/announcedata', token);
       const sortedAnnouncements = announceDataResponse.data.announcements.sort(
