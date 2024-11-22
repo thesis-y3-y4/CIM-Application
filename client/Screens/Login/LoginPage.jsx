@@ -42,12 +42,19 @@ function LoginPage({props}) {
       console.log(response.data);
       if (response.data.status === 'ok') {
         const token = response.data.data;
-        await storeToken(token); // Store token
+        await storeToken(token);
 
         // After storing the token, proceed as usual
         await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
         const retrievedToken = await getToken();
-        navigation.navigate('DrawerHome');
+        if (retrievedToken !== token) {
+          Alert.alert(
+            'Your session has expired on another device. Please log in again.',
+          );
+          navigation.navigate('Login');
+        } else {
+          navigation.navigate('DrawerHome');
+        }
       } else {
         emailInputRef.current.clear();
         passwordInputRef.current.clear();

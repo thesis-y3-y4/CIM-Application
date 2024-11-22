@@ -85,18 +85,42 @@ function DrawerContent({refreshData}) {
 
   async function signOut() {
     try {
-      //close DrawerContent
-      navigation.dispatch(DrawerActions.closeDrawer());
+      // Get token from storage
+      const token = await getToken();
+      if (!token) {
+        console.log('No token found');
+        return;
+      }
 
-      await AsyncStorage.removeItem('isLoggedIn');
-      await AsyncStorage.removeItem('token');
+      // Get user data to fetch studentemail
+      const {studentemail} = userData;
 
-      setUserData({});
-
-      navigation.reset({
-        index: 0,
-        routes: [{name: 'LoginUser'}],
+      // Call the /logout-user endpoint
+      const response = await fetchData('/logout-user', token, 'POST', {
+        studentemail,
       });
+
+      if (response.status === 'ok') {
+        console.log('Logged out successfully');
+
+        // Close DrawerContent
+        navigation.dispatch(DrawerActions.closeDrawer());
+
+        // Remove token and user data from AsyncStorage
+        await AsyncStorage.removeItem('isLoggedIn');
+        await AsyncStorage.removeItem('token');
+
+        // Reset user data state
+        setUserData({});
+
+        // Navigate to Login screen
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'LoginUser'}],
+        });
+      } else {
+        console.log('Error during logout:', response.message);
+      }
     } catch (error) {
       console.error('Error during sign out:', error);
     }
