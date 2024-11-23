@@ -69,6 +69,12 @@ function NotificationScreen(props) {
     }
   };
 
+  const markAllNotificationAsRead = async () => {
+    if (socket && userData._id) {
+      socket.emit('markAllNotificationsAsRead', userData._id);
+    }
+  };
+
   useEffect(() => {
     getData();
   }, []);
@@ -103,6 +109,7 @@ function NotificationScreen(props) {
 
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', () => {
+      markAllNotificationAsRead();
       getData();
     });
 
