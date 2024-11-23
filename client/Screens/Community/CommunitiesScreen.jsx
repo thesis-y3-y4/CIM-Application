@@ -44,21 +44,12 @@ function CommunitiesScreen(props) {
     useState([]);
   const [displayedCommunityAnnouncements, setDisplayedCommunityAnnouncements] =
     useState([]);
-  const [hasCommunity, setHasCommunity] = useState(true);
 
   async function getData() {
     const token = await getToken();
     try {
       const response = await fetchData('/userdata', token);
       setUserData(response.data.data);
-      // Check if user has any community
-      const userCommunities = response.data.data.communities;
-      if (!userCommunities || userCommunities.length === 0) {
-        setHasCommunity(false);
-      } else {
-        setHasCommunity(true);
-      }
-      console.log(hasCommunity);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -72,7 +63,6 @@ function CommunitiesScreen(props) {
         token,
       );
       const fetchedAnnouncements = announcementResponse.data.announcements;
-      console.log(fetchedAnnouncements);
 
       const sortedAnnouncements = fetchedAnnouncements.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
@@ -207,12 +197,12 @@ function CommunitiesScreen(props) {
     />
   );
 
-  const renderCommunityItem = ({item, index}) => (
+  const renderCommunityItem = ({ item, index }) => (
     <TouchableOpacity
       style={[
         styles.communityCard,
         {
-          backgroundColor: index % 2 === 0 ? '#f8ec2c' : '#40ac44',
+          backgroundColor: index % 2 === 0 ? '#f8ec2c' : '#40ac44', 
         },
       ]}
       onPress={() =>
@@ -220,18 +210,20 @@ function CommunitiesScreen(props) {
           communityId: item._id,
           userData: userData,
         })
-      }>
+      }
+    >
       <View style={styles.logoContainer}>
         <ImageBackground
           source={
             item.logo
-              ? {uri: item.logo}
+              ? { uri: item.logo } 
               : require('../../assets/default-logo.png')
           }
           style={styles.imageBackground}
-          imageStyle={{resizeMode: 'cover'}}></ImageBackground>
-      </View>
-      <View>
+          imageStyle={{ resizeMode: 'cover' }}
+        >
+        </ImageBackground>
+      </View><View>
         <Text
           style={styles.comName}
           numberOfLines={2} // Limits the text to one line
@@ -242,7 +234,7 @@ function CommunitiesScreen(props) {
       </View>
     </TouchableOpacity>
   );
-
+  
   const handleSearchChange = text => {
     setSearchText(text);
     if (text === '') {
@@ -329,64 +321,55 @@ function CommunitiesScreen(props) {
           </TouchableOpacity>
         </View>
 
-        {hasCommunity ? (
-          activeTab === 'myCommunity' ? (
-            <FlatList
-              data={displayedCommunityAnnouncements}
-              renderItem={renderAnnouncementItem}
-              keyExtractor={item => item._id}
-              contentContainerStyle={styles.scrollViewContent}
-              ListHeaderComponent={
-                <Text
-                  style={{
-                    color: 'darkgreen',
-                    fontSize: 18,
-                    padding: 10,
-                    paddingTop: 15,
-                    paddingLeft: 20,
-                    paddingBottom: 10,
-                  }}>
-                  Recent Posts
-                </Text>
-              }
-              ListFooterComponent={
-                hasMoreAnnouncements && (
-                  <SeeMoreButton
-                    onPress={loadMoreCommunityAnnouncements}
-                    remainingItems={remainingCommunityAnnouncements.length}
-                  />
-                )
-              }
-            />
-          ) : (
-            <View style={{backgroundColor: '#306434', flex: 1}}>
-              <TextInput
-                style={styles.communitySearchBar}
-                placeholder="Search Community..."
-                placeholderTextColor="grey"
-                onChangeText={handleSearchChange}
-                value={searchText}
-              />
-              <FlatList
-                data={filteredCommunities}
-                renderItem={renderCommunityItem}
-                keyExtractor={item => item._id}
-                numColumns={3}
-                columnWrapperStyle={{justifyContent: 'space-between'}}
-                contentContainerStyle={styles.scrollViewContent}
-              />
-            </View>
-          )
+        {activeTab === 'myCommunity' ? (
+          <FlatList
+            data={displayedCommunityAnnouncements}
+            renderItem={renderAnnouncementItem}
+            keyExtractor={item => item._id}
+            contentContainerStyle={styles.scrollViewContent}
+            ListHeaderComponent={
+              <Text
+                style={{
+                  color: 'darkgreen',
+                  fontSize: 18,
+                  padding: 10,
+                  paddingTop: 15,
+                  paddingLeft: 20,
+                  paddingBottom: 10,
+                }}>
+                Recent Posts
+              </Text>
+            }
+            ListFooterComponent={
+              hasMoreAnnouncements && (
+                <SeeMoreButton
+                  onPress={loadMoreCommunityAnnouncements}
+                  remainingItems={remainingCommunityAnnouncements.length}
+                />
+              )
+            }
+          />
         ) : (
-          <View
-            style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <Text
-              style={{color: 'darkgreen', fontSize: 18, fontWeight: 'bold'}}>
-              You are not part of any community
-            </Text>
+          <View style={{backgroundColor: '#306434', flex: 1}}>
+            <TextInput
+              style={styles.communitySearchBar}
+              placeholder="Search Community..."
+              placeholderTextColor="grey"
+              onChangeText={handleSearchChange}
+              value={searchText}
+            />
+            <FlatList
+              data={filteredCommunities}
+              renderItem={renderCommunityItem}
+              keyExtractor={item => item._id}
+              numColumns={3}
+              columnWrapperStyle={{justifyContent: 'space-between'}}
+              contentContainerStyle={styles.scrollViewContent}
+            />
           </View>
         )}
       </View>
+
       <LargeMediaModal
         visible={modalVisible}
         mediaUrl={selectedMediaUrl}
