@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
   commentButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: '40%',
+    marginLeft: '37%',
   },
   commentButtonForum: {
     flexDirection: 'row',

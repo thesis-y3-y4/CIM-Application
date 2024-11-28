@@ -176,7 +176,6 @@ const ForumPostCard = ({
         });
         fetchFriendStatus(userId, recipientId);
       }
-      console.log(response.data.message);
     } catch (error) {
       console.error('Error adding friend:', error);
       Toast.show({
@@ -198,7 +197,6 @@ const ForumPostCard = ({
         token,
         'GET',
       );
-      console.log(response.data);
       setFriendStatus(response.data);
     } catch (error) {
       console.error('Error fetching friend status:', error);

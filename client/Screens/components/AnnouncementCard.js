@@ -42,6 +42,7 @@ const AnnouncementCard = ({
 
   useEffect(() => {
     checkIfUserPlayed();
+    fetchCommentsCount();
     if (
       item.mediaUrl &&
       (item.contentType === 'image/jpeg' ||
@@ -205,7 +206,6 @@ const AnnouncementCard = ({
 
   const fetchComments = async () => {
     const token = await getToken();
-    console.log(item._id);
     try {
       const response = await fetchData(
         `/fetchcomments/${item._id}/announcement`,
