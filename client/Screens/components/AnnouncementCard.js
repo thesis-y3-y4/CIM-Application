@@ -38,6 +38,7 @@ const AnnouncementCard = ({
   const [refreshCheck, setRefreshCheck] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audio, setAudio] = useState(null);
+  const [commentsCount, setCommentsCount] = useState(0);
 
   useEffect(() => {
     checkIfUserPlayed();
@@ -216,6 +217,20 @@ const AnnouncementCard = ({
     }
   };
 
+  const fetchCommentsCount = async () => {
+    const token = await getToken();
+    try {
+      const response = await fetchData(
+        `/commentscount/${item._id}/announcement`,
+        token,
+        'GET',
+      );
+      setCommentsCount(response.data.count);
+    } catch (error) {
+      console.error('Error fetching comment count:', error);
+    }
+  };
+
   const addComment = async () => {
     const token = await getToken();
     if (newComment.trim()) {
@@ -337,7 +352,7 @@ const AnnouncementCard = ({
             }}
             style={styles.commentButton}>
             <Icon name="message1" size={24} color="black" />
-            <Text style={styles.commentText}>Comments</Text>
+            <Text style={styles.commentText}>{commentsCount} Comments</Text>
           </TouchableOpacity>
         </View>
       </View>

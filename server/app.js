@@ -618,6 +618,26 @@ app.get("/fetchcomments/:postId/:postType", async (req, res) => {
   }
 });
 
+app.get(
+  "/commentscount/:postId/announcement",
+  authenticateToken,
+  async (req, res) => {
+    const { postId } = req.params;
+    try {
+      const commentsCount = await postCommentsModel.countDocuments({
+        postId,
+        postType: "announcement",
+      });
+      res.status(200).json({ count });
+    } catch (error) {
+      console.error("Error fetching comments count:", error);
+      res
+        .status(500)
+        .send({ status: "error", message: "Internal server error" });
+    }
+  }
+);
+
 //Get MinigameWord -  AnnouncementPost
 app.post("/announcedata/:announcementId", async (req, res) => {
   try {
