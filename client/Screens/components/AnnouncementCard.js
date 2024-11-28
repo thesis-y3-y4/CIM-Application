@@ -205,6 +205,7 @@ const AnnouncementCard = ({
 
   const fetchComments = async () => {
     const token = await getToken();
+    console.log(item._id);
     try {
       const response = await fetchData(
         `/fetchcomments/${item._id}/announcement`,

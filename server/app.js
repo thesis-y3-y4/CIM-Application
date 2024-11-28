@@ -628,7 +628,7 @@ app.get(
         postId,
         postType: "announcement",
       });
-      res.status(200).json({ count });
+      res.status(200).json({ count: commentsCount });
     } catch (error) {
       console.error("Error fetching comments count:", error);
       res
