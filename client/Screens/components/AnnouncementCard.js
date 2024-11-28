@@ -17,6 +17,7 @@ import {useNavigation} from '@react-navigation/native';
 import TimeDisplay from './TimeDisplay';
 import Sound from 'react-native-sound';
 import Hyperlink from 'react-native-hyperlink';
+import {Linking} from 'react-native';
 
 const AnnouncementCard = ({
   item,
@@ -186,7 +187,14 @@ const AnnouncementCard = ({
     if (containsLink) {
       return (
         <View style={styles.details}>
-          <Hyperlink linkDefault={true} linkStyle={styles.linkText}>
+          <Hyperlink
+            linkDefault={false}
+            linkStyle={styles.linkText}
+            onPress={url => {
+              Linking.openURL(url).catch(err =>
+                console.error('Failed to open URL:', err),
+              );
+            }}>
             {item.body.length > maxLength ? (
               renderText(item.body)
             ) : (
