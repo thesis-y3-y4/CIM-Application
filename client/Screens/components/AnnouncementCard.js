@@ -16,6 +16,7 @@ import {fetchData} from '../api/api';
 import {useNavigation} from '@react-navigation/native';
 import TimeDisplay from './TimeDisplay';
 import Sound from 'react-native-sound';
+import Hyperlink from 'react-native-hyperlink';
 
 const AnnouncementCard = ({
   item,
@@ -149,7 +150,7 @@ const AnnouncementCard = ({
           if (!success) {
             console.error('Playback failed due to decoding issues');
           }
-          sound.release(); // Release the sound resource after playback
+          sound.release();
           setAudio(null);
           setIsPlaying(false);
           console.log('Audio playback finished');
@@ -167,17 +168,38 @@ const AnnouncementCard = ({
 
   const renderDetails = () => {
     const maxLength = 150;
-    if (item.body.length > maxLength) {
-      return (
-        <Text style={styles.details}>
-          {seeMore ? item.body : `${item.body.substring(0, maxLength)}...`}{' '}
-          <Text style={styles.seeMoreText} onPress={() => setSeeMore(!seeMore)}>
-            {seeMore ? 'See Less' : 'See More'}
-          </Text>
+
+    // Regular expression to check if the text contains a URL
+    const containsLink = /https?:\/\/[^\s]+/.test(item.body);
+
+    const renderText = text => (
+      <Text style={styles.details}>
+        {seeMore ? text : `${text.substring(0, maxLength)}...`}{' '}
+        <Text style={styles.seeMoreText} onPress={() => setSeeMore(!seeMore)}>
+          {seeMore ? 'See Less' : 'See More'}
         </Text>
+      </Text>
+    );
+
+    if (containsLink) {
+      return (
+        <View style={styles.details}>
+          <Hyperlink linkDefault={true} linkStyle={styles.linkText}>
+            {item.body.length > maxLength ? (
+              renderText(item.body)
+            ) : (
+              <Text style={styles.details}>{item.body}</Text>
+            )}
+          </Hyperlink>
+        </View>
       );
     }
-    return <Text style={styles.details}>{item.body}</Text>;
+
+    return item.body.length > maxLength ? (
+      renderText(item.body)
+    ) : (
+      <Text style={styles.details}>{item.body}</Text>
+    );
   };
 
   const fetchComments = async () => {

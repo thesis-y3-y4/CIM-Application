@@ -208,6 +208,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#777',
   },
+  linkText: {
+    color: 'darkgreen',
+    textDecorationLine: 'underline',
+  },
   details: {
     marginTop: 5,
     color: '#333',
